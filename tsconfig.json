@@ -1,0 +1,55 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "isolatedModules": false,
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true
+    },
+    "filesGlob": [
+        "**/*.ts",
+        "**/*.tsx",
+        "!node_modules/**"
+    ],
+    "compileOnSave": true,
+    "buildOnSave": false,
+    "files": [
+        "index.ts",
+        "src/enums/PromiseState.ts",
+        "src/interfaces/ICallback.ts",
+        "src/interfaces/IFailureCallback.ts",
+        "src/interfaces/ISuccessCallback.ts",
+        "src/PromiseMock.ts",
+        "tests/PromiseMockTest.ts",
+        "typings/main.d.ts"
+    ],
+    "exclude": [
+        "typings/browser.d.ts",
+        "typings/browser",
+        "typings/main"
+    ],
+    "atom": {
+        "rewriteTsconfig": true,
+        "formatOnSave": true
+    },
+    "formatCodeOptions": {
+        "indentSize": 2,
+        "tabSize": 2,
+        "insertSpaceAfterCommaDelimiter": true,
+        "insertSpaceAfterSemicolonInForStatements": true,
+        "insertSpaceBeforeAndAfterBinaryOperators": true,
+        "insertSpaceAfterKeywordsInControlFlowStatements": true,
+        "insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+        "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+        "placeOpenBraceOnNewLineForFunctions": false,
+        "placeOpenBraceOnNewLineForControlBlocks": false
+    }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "promise-sync",
+  "version": "0.1.0",
+  "description": "synchronous promise stub",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha tests --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slavik57/promise-sync.git"
+  },
+  "keywords": [
+    "promise"
+  ],
+  "author": "Slava Shpitalny <slavik57@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/slavik57/promise-sync/issues"
+  },
+  "homepage": "https://github.com/slavik57/promise-sync#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "sinon": "^1.17.3"
+  }
+}
