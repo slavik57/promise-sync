@@ -70,14 +70,27 @@ export class PromiseMock<T> {
       this._resolveCallback(_callback, data));
   }
 
+  private _isNullOrUndefined(obj: any): boolean {
+    return obj === null || obj === undefined;
+  }
+
   private _resolveCallback(callback: ICallback<T>, data: T): void {
     if (!callback.success) {
       return;
     }
 
+    var result: any;
     try {
-      callback.success(data);
+      result = callback.success(data);
     } catch (e) {
+      return;
+    }
+
+    if (result instanceof PromiseMock) {
+      var promiseResult = <PromiseMock<any>>result;
+      promiseResult.success(_data => callback.nextPromise.resolve(_data));
+    } else {
+      callback.nextPromise.resolve(result);
     }
   }
 }

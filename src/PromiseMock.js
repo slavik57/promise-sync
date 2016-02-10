@@ -52,14 +52,26 @@ var PromiseMock = (function () {
             return _this._resolveCallback(_callback, data);
         });
     };
+    PromiseMock.prototype._isNullOrUndefined = function (obj) {
+        return obj === null || obj === undefined;
+    };
     PromiseMock.prototype._resolveCallback = function (callback, data) {
         if (!callback.success) {
             return;
         }
+        var result;
         try {
-            callback.success(data);
+            result = callback.success(data);
         }
         catch (e) {
+            return;
+        }
+        if (result instanceof PromiseMock) {
+            var promiseResult = result;
+            promiseResult.success(function (_data) { return callback.nextPromise.resolve(_data); });
+        }
+        else {
+            callback.nextPromise.resolve(result);
         }
     };
     return PromiseMock;

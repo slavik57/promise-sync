@@ -4,7 +4,7 @@
   "description": "synchronous promise stub",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha tests --recursive"
+    "test": "mocha tests --recursive -c -b"
   },
   "repository": {
     "type": "git",
