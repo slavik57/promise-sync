@@ -25,6 +25,7 @@ var PromiseMock = (function () {
             throw new Error('Cannot reject not pending promise');
         }
         this._state = PromiseState_1.PromiseState.Rejected;
+        this._rejectCallbacks(reason);
     };
     PromiseMock.prototype.success = function (successCallback) {
         var callback = {
@@ -34,6 +35,17 @@ var PromiseMock = (function () {
         this._callbacks.push(callback);
         if (this._isResolved()) {
             this._resolveCallbaks(this._resolvedData);
+        }
+        return callback.nextPromise;
+    };
+    PromiseMock.prototype.catch = function (failureCallback) {
+        var callback = {
+            failure: failureCallback,
+            nextPromise: new PromiseMock()
+        };
+        this._callbacks.push(callback);
+        if (this._isRejected()) {
+            this._rejectCallbacks(this._rejectedReason);
         }
         return callback.nextPromise;
     };
@@ -64,14 +76,33 @@ var PromiseMock = (function () {
             result = callback.success(data);
         }
         catch (e) {
+            callback.nextPromise.reject(e);
             return;
         }
         if (result instanceof PromiseMock) {
             var promiseResult = result;
             promiseResult.success(function (_data) { return callback.nextPromise.resolve(_data); });
+            promiseResult.catch(function (_error) { return callback.nextPromise.reject(_error); });
         }
         else {
             callback.nextPromise.resolve(result);
+        }
+    };
+    PromiseMock.prototype._rejectCallbacks = function (error) {
+        var _this = this;
+        this._callbacks.forEach(function (_callback) {
+            return _this._rejectCallback(_callback, error);
+        });
+    };
+    PromiseMock.prototype._rejectCallback = function (callback, error) {
+        if (!callback.failure) {
+            return;
+        }
+        try {
+            callback.failure(error);
+        }
+        catch (e) {
+            callback.nextPromise.reject(e);
         }
     };
     return PromiseMock;
