@@ -36,11 +36,35 @@ describe('PromiseMock', function () {
             var promiseMock = new PromiseMock_1.PromiseMock();
             chai_1.expect(promiseMock.state).to.equal(PromiseState_1.PromiseState.Pending);
         });
+        it('constructor - should initialize isFulfilled correctly', function () {
+            var promiseMock = new PromiseMock_1.PromiseMock();
+            chai_1.expect(promiseMock.isFulfilled()).to.equal(false);
+        });
+        it('constructor - should initialize isRejected correctly', function () {
+            var promiseMock = new PromiseMock_1.PromiseMock();
+            chai_1.expect(promiseMock.isRejected()).to.equal(false);
+        });
+        it('constructor - should initialize isPending correctly', function () {
+            var promiseMock = new PromiseMock_1.PromiseMock();
+            chai_1.expect(promiseMock.isPending()).to.equal(true);
+        });
     });
     describe('resolve', function () {
         it('resove - resolve should set the state to resolved', function () {
             promiseMock.resolve();
-            chai_1.expect(promiseMock.state).to.equal(PromiseState_1.PromiseState.Resolved);
+            chai_1.expect(promiseMock.state).to.equal(PromiseState_1.PromiseState.Fulfilled);
+        });
+        it('resove - isFulfilled should be true', function () {
+            promiseMock.resolve();
+            chai_1.expect(promiseMock.isFulfilled()).to.equal(true);
+        });
+        it('resove - isRejected should be false', function () {
+            promiseMock.resolve();
+            chai_1.expect(promiseMock.isRejected()).to.equal(false);
+        });
+        it('resove - isPending should be false', function () {
+            promiseMock.resolve();
+            chai_1.expect(promiseMock.isPending()).to.equal(false);
         });
         it('resove - resolve twice should fail', function () {
             promiseMock.resolve();
@@ -56,6 +80,18 @@ describe('PromiseMock', function () {
             promiseMock.reject();
             chai_1.expect(promiseMock.state).to.equal(PromiseState_1.PromiseState.Rejected);
         });
+        it('reject - reject should set isFulfilled to false', function () {
+            promiseMock.reject();
+            chai_1.expect(promiseMock.isFulfilled()).to.equal(false);
+        });
+        it('reject - reject should set isPending to false', function () {
+            promiseMock.reject();
+            chai_1.expect(promiseMock.isPending()).to.equal(false);
+        });
+        it('reject - reject should set isRejected to false', function () {
+            promiseMock.reject();
+            chai_1.expect(promiseMock.isRejected()).to.equal(true);
+        });
         it('reject - reject twice should not fail and set as rejected', function () {
             promiseMock.reject();
             chai_1.expect(function () { return promiseMock.reject(); }).to.throw(Error);
@@ -69,6 +105,7 @@ describe('PromiseMock', function () {
         it('success - should return new promise', function () {
             var result = promiseMock.success(function () { });
             chai_1.expect(result).not.to.be.equal(promiseMock);
+            chai_1.expect(result).not.to.be.null;
         });
         it('success - resolving should call all the callbacks', function () {
             var numberOfTimesCalled1 = 0;
@@ -337,11 +374,21 @@ describe('PromiseMock', function () {
                     data: error3
                 }]);
         });
+        it('success - register success, resolve promise, register another success, should not call first callback on the second time', function () {
+            var numberOfTimesCalled = 0;
+            var successCallback = function () { return numberOfTimesCalled++; };
+            promiseMock.success(successCallback);
+            promiseMock.resolve();
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            promiseMock.success(function () { });
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+        });
     });
     describe('catch', function () {
         it('catch - should return new promise', function () {
             var result = promiseMock.catch(function () { });
             chai_1.expect(result).not.to.be.equal(promiseMock);
+            chai_1.expect(result).not.to.be.null;
         });
         it('catch - rejecting should call all the callbacks', function () {
             var numberOfTimesCalled1 = 0;
@@ -504,6 +551,219 @@ describe('PromiseMock', function () {
                     data: error4
                 }
             ]);
+            it('catch - register catch, reject promise, register another catch, should not call first callback on the second time', function () {
+                var numberOfTimesCalled = 0;
+                var catchCallback = function () { return numberOfTimesCalled++; };
+                promiseMock.catch(catchCallback);
+                promiseMock.reject();
+                chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+                promiseMock.catch(function () { });
+                chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            });
+        });
+    });
+    describe('finally', function () {
+        it('finally - should return new promise', function () {
+            var result = promiseMock.finally(function () { });
+            chai_1.expect(result).not.to.be.equal(promiseMock);
+            chai_1.expect(result).not.to.be.null;
+        });
+        it('finally - resolving should call all the callbacks', function () {
+            var numberOfTimesCalled1 = 0;
+            var callback1 = function () { return numberOfTimesCalled1++; };
+            var numberOfTimesCalled2 = 0;
+            var callback2 = function () { return numberOfTimesCalled2++; };
+            var numberOfTimesCalled3 = 0;
+            var callback3 = function () { return numberOfTimesCalled3++; };
+            var numberOfTimesCalled4 = 0;
+            var callback4 = function () { return numberOfTimesCalled4++; };
+            promiseMock.finally(callback1);
+            promiseMock.finally(callback2);
+            promiseMock.finally(callback3);
+            promiseMock.finally(callback4);
+            promiseMock.resolve();
+            chai_1.expect(numberOfTimesCalled1).to.be.equal(1);
+            chai_1.expect(numberOfTimesCalled2).to.be.equal(1);
+            chai_1.expect(numberOfTimesCalled3).to.be.equal(1);
+            chai_1.expect(numberOfTimesCalled4).to.be.equal(1);
+        });
+        it('finally - rejecting should call all the callbacks', function () {
+            var numberOfTimesCalled1 = 0;
+            var callback1 = function () { return numberOfTimesCalled1++; };
+            var numberOfTimesCalled2 = 0;
+            var callback2 = function () { return numberOfTimesCalled2++; };
+            var numberOfTimesCalled3 = 0;
+            var callback3 = function () { return numberOfTimesCalled3++; };
+            var numberOfTimesCalled4 = 0;
+            var callback4 = function () { return numberOfTimesCalled4++; };
+            promiseMock.finally(callback1);
+            promiseMock.finally(callback2);
+            promiseMock.finally(callback3);
+            promiseMock.finally(callback4);
+            promiseMock.reject();
+            chai_1.expect(numberOfTimesCalled1).to.be.equal(1);
+            chai_1.expect(numberOfTimesCalled2).to.be.equal(1);
+            chai_1.expect(numberOfTimesCalled3).to.be.equal(1);
+            chai_1.expect(numberOfTimesCalled4).to.be.equal(1);
+        });
+        it('finally - resolve and then register finally callback, should call the callback', function () {
+            var numberOfTimesCalled = 0;
+            var callback = function () { return numberOfTimesCalled++; };
+            promiseMock.resolve();
+            promiseMock.finally(callback);
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+        });
+        it('finally - resolving with data should resolve the returned promise with same data', function () {
+            var data = {};
+            var numberOfTimesCalled1 = 0;
+            var callback1 = function () {
+                numberOfTimesCalled1++;
+            };
+            var numberOfTimesCalled2 = 0;
+            var callback2 = function (_data) {
+                numberOfTimesCalled2++;
+                chai_1.expect(_data).to.be.equal(data);
+            };
+            promiseMock.finally(callback1)
+                .success(callback2);
+            promiseMock.resolve(data);
+            chai_1.expect(numberOfTimesCalled1).to.be.equal(1);
+            chai_1.expect(numberOfTimesCalled2).to.be.equal(1);
+        });
+        it('finally - rejecting with error should reject the returned promise with same error', function () {
+            var error = {};
+            var numberOfTimesCalled1 = 0;
+            var callback1 = function () {
+                numberOfTimesCalled1++;
+            };
+            var numberOfTimesCalled2 = 0;
+            var callback2 = function (_data) {
+                numberOfTimesCalled2++;
+                chai_1.expect(_data).to.be.equal(error);
+            };
+            promiseMock.finally(callback1)
+                .catch(callback2);
+            promiseMock.reject(error);
+            chai_1.expect(numberOfTimesCalled1).to.be.equal(1);
+            chai_1.expect(numberOfTimesCalled2).to.be.equal(1);
+        });
+        it('finally - success callback throws error should still call the finally callback', function () {
+            var successCallback = function () { throw ''; };
+            var numberOfTimesCalled = 0;
+            var finallyCallback = function () { return numberOfTimesCalled++; };
+            promiseMock.success(successCallback);
+            promiseMock.finally(finallyCallback);
+            promiseMock.resolve();
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+        });
+        it('finally - catch callback throws error should still call the finally callback', function () {
+            var catchCallback = function () { throw ''; };
+            var numberOfTimesCalled = 0;
+            var finallyCallback = function () { return numberOfTimesCalled++; };
+            promiseMock.catch(catchCallback);
+            promiseMock.finally(finallyCallback);
+            promiseMock.resolve();
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+        });
+        it('finally - success callback throws error should still call the returned promise finally callback', function () {
+            var successCallback = function () { throw ''; };
+            var numberOfTimesCalled = 0;
+            var finallyCallback = function () { return numberOfTimesCalled++; };
+            promiseMock.success(successCallback)
+                .finally(finallyCallback);
+            promiseMock.resolve();
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+        });
+        it('finally - catch callback throws error should still call the returned promise finally callback', function () {
+            var catchCallback = function () { throw ''; };
+            var numberOfTimesCalled = 0;
+            var finallyCallback = function () { return numberOfTimesCalled++; };
+            promiseMock.catch(catchCallback)
+                .finally(finallyCallback);
+            promiseMock.reject();
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+        });
+        it('finally - register finally, resolve promise, register another finally, should not call first callback on the second time', function () {
+            var numberOfTimesCalled = 0;
+            var finallyCallback = function () { return numberOfTimesCalled++; };
+            promiseMock.finally(finallyCallback);
+            promiseMock.resolve();
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            promiseMock.finally(function () { });
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+        });
+        it('finally - register finally, reject promise, register another finally, should not call first callback on the second time', function () {
+            var numberOfTimesCalled = 0;
+            var finallyCallback = function () { return numberOfTimesCalled++; };
+            promiseMock.finally(finallyCallback);
+            promiseMock.reject();
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            promiseMock.finally(function () { });
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+        });
+        it('finally - register finally, return promise from callback, register success after finally, the success will be called after the returned promise is resolved', function () {
+            var finallyReturnedPromiseMock = new PromiseMock_1.PromiseMock();
+            var finallyCallback = function () { return finallyReturnedPromiseMock; };
+            var data = 111;
+            var numberOfTimesCalled = 0;
+            var successCallback = function (_data) {
+                numberOfTimesCalled++;
+                chai_1.expect(_data).to.be.equal(data);
+            };
+            promiseMock.finally(finallyCallback)
+                .success(successCallback);
+            promiseMock.resolve(data);
+            chai_1.expect(numberOfTimesCalled).to.be.equal(0);
+            finallyReturnedPromiseMock.resolve();
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+        });
+        it('finally - register finally, return promise from callback, register success after finally, the success will be called after the returned promise is rejected', function () {
+            var finallyReturnedPromiseMock = new PromiseMock_1.PromiseMock();
+            var finallyCallback = function () { return finallyReturnedPromiseMock; };
+            var data = 111;
+            var numberOfTimesCalled = 0;
+            var successCallback = function (_data) {
+                numberOfTimesCalled++;
+                chai_1.expect(_data).to.be.equal(data);
+            };
+            promiseMock.finally(finallyCallback)
+                .success(successCallback);
+            promiseMock.resolve(data);
+            chai_1.expect(numberOfTimesCalled).to.be.equal(0);
+            finallyReturnedPromiseMock.reject();
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+        });
+        it('finally - register finally, return promise from callback, register catch after finally, the catch will be called after the returned promise is resolved', function () {
+            var finallyReturnedPromiseMock = new PromiseMock_1.PromiseMock();
+            var finallyCallback = function () { return finallyReturnedPromiseMock; };
+            var error = 111;
+            var numberOfTimesCalled = 0;
+            var catchCallback = function (_error) {
+                numberOfTimesCalled++;
+                chai_1.expect(_error).to.be.equal(error);
+            };
+            promiseMock.finally(finallyCallback)
+                .catch(catchCallback);
+            promiseMock.reject(error);
+            chai_1.expect(numberOfTimesCalled).to.be.equal(0);
+            finallyReturnedPromiseMock.resolve();
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+        });
+        it('finally - register finally, return promise from callback, register catch after finally, the catch will be called after the returned promise is rejected', function () {
+            var finallyReturnedPromiseMock = new PromiseMock_1.PromiseMock();
+            var finallyCallback = function () { return finallyReturnedPromiseMock; };
+            var error = 111;
+            var numberOfTimesCalled = 0;
+            var catchCallback = function (_error) {
+                numberOfTimesCalled++;
+                chai_1.expect(_error).to.be.equal(error);
+            };
+            promiseMock.finally(finallyCallback)
+                .catch(catchCallback);
+            promiseMock.reject(error);
+            chai_1.expect(numberOfTimesCalled).to.be.equal(0);
+            finallyReturnedPromiseMock.reject();
+            chai_1.expect(numberOfTimesCalled).to.be.equal(1);
         });
     });
 });

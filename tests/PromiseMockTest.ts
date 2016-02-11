@@ -51,6 +51,30 @@ describe('PromiseMock', () => {
       // Assert
       expect(promiseMock.state).to.equal(PromiseState.Pending);
     });
+
+    it('constructor - should initialize isFulfilled correctly', () => {
+      // Act
+      var promiseMock = new PromiseMock();
+
+      // Assert
+      expect(promiseMock.isFulfilled()).to.equal(false);
+    });
+
+    it('constructor - should initialize isRejected correctly', () => {
+      // Act
+      var promiseMock = new PromiseMock();
+
+      // Assert
+      expect(promiseMock.isRejected()).to.equal(false);
+    });
+
+    it('constructor - should initialize isPending correctly', () => {
+      // Act
+      var promiseMock = new PromiseMock();
+
+      // Assert
+      expect(promiseMock.isPending()).to.equal(true);
+    });
   });
 
   describe('resolve', () => {
@@ -59,7 +83,31 @@ describe('PromiseMock', () => {
       promiseMock.resolve();
 
       // Assert
-      expect(promiseMock.state).to.equal(PromiseState.Resolved);
+      expect(promiseMock.state).to.equal(PromiseState.Fulfilled);
+    });
+
+    it('resove - isFulfilled should be true', () => {
+      // Act
+      promiseMock.resolve();
+
+      // Assert
+      expect(promiseMock.isFulfilled()).to.equal(true);
+    });
+
+    it('resove - isRejected should be false', () => {
+      // Act
+      promiseMock.resolve();
+
+      // Assert
+      expect(promiseMock.isRejected()).to.equal(false);
+    });
+
+    it('resove - isPending should be false', () => {
+      // Act
+      promiseMock.resolve();
+
+      // Assert
+      expect(promiseMock.isPending()).to.equal(false);
     });
 
     it('resove - resolve twice should fail', () => {
@@ -88,6 +136,30 @@ describe('PromiseMock', () => {
       expect(promiseMock.state).to.equal(PromiseState.Rejected);
     });
 
+    it('reject - reject should set isFulfilled to false', () => {
+      // Act
+      promiseMock.reject();
+
+      // Assert
+      expect(promiseMock.isFulfilled()).to.equal(false);
+    });
+
+    it('reject - reject should set isPending to false', () => {
+      // Act
+      promiseMock.reject();
+
+      // Assert
+      expect(promiseMock.isPending()).to.equal(false);
+    });
+
+    it('reject - reject should set isRejected to false', () => {
+      // Act
+      promiseMock.reject();
+
+      // Assert
+      expect(promiseMock.isRejected()).to.equal(true);
+    });
+
     it('reject - reject twice should not fail and set as rejected', () => {
       // Act
       promiseMock.reject();
@@ -112,6 +184,7 @@ describe('PromiseMock', () => {
 
       // Assert
       expect(result).not.to.be.equal(promiseMock);
+      expect(result).not.to.be.null;
     });
 
     it('success - resolving should call all the callbacks', () => {
@@ -500,6 +573,23 @@ describe('PromiseMock', () => {
           data: error3
         }]);
     });
+
+    it('success - register success, resolve promise, register another success, should not call first callback on the second time', () => {
+      // Arrange
+      var numberOfTimesCalled = 0;
+      var successCallback = () => numberOfTimesCalled++;
+
+      // Act
+      promiseMock.success(successCallback);
+      promiseMock.resolve();
+
+      expect(numberOfTimesCalled).to.be.equal(1);
+
+      promiseMock.success(() => { });
+
+      // Assert
+      expect(numberOfTimesCalled).to.be.equal(1);
+    });
   });
 
   describe('catch', () => {
@@ -509,6 +599,7 @@ describe('PromiseMock', () => {
 
       // Assert
       expect(result).not.to.be.equal(promiseMock);
+      expect(result).not.to.be.null;
     });
 
     it('catch - rejecting should call all the callbacks', () => {
@@ -757,6 +848,363 @@ describe('PromiseMock', () => {
           data: error4
         }
       ]);
+
+      it('catch - register catch, reject promise, register another catch, should not call first callback on the second time', () => {
+        // Arrange
+        var numberOfTimesCalled = 0;
+        var catchCallback = () => numberOfTimesCalled++;
+
+        // Act
+        promiseMock.catch(catchCallback);
+        promiseMock.reject();
+
+        expect(numberOfTimesCalled).to.be.equal(1);
+
+        promiseMock.catch(() => { });
+
+        // Assert
+        expect(numberOfTimesCalled).to.be.equal(1);
+      });
+    });
+  });
+
+  describe('finally', () => {
+    it('finally - should return new promise', () => {
+      // Act
+      var result: PromiseMock<any> = promiseMock.finally(() => { });
+
+      // Assert
+      expect(result).not.to.be.equal(promiseMock);
+      expect(result).not.to.be.null;
+    });
+
+    it('finally - resolving should call all the callbacks', () => {
+      // Arrange
+      var numberOfTimesCalled1 = 0;
+      var callback1 = () => numberOfTimesCalled1++;
+
+      var numberOfTimesCalled2 = 0;
+      var callback2 = () => numberOfTimesCalled2++;
+
+      var numberOfTimesCalled3 = 0;
+      var callback3 = () => numberOfTimesCalled3++;
+
+      var numberOfTimesCalled4 = 0;
+      var callback4 = () => numberOfTimesCalled4++;
+
+      promiseMock.finally(callback1);
+      promiseMock.finally(callback2);
+      promiseMock.finally(callback3);
+      promiseMock.finally(callback4);
+
+      // Act
+      promiseMock.resolve();
+
+      // Assert
+      expect(numberOfTimesCalled1).to.be.equal(1);
+      expect(numberOfTimesCalled2).to.be.equal(1);
+      expect(numberOfTimesCalled3).to.be.equal(1);
+      expect(numberOfTimesCalled4).to.be.equal(1);
+    });
+
+    it('finally - rejecting should call all the callbacks', () => {
+      // Arrange
+      var numberOfTimesCalled1 = 0;
+      var callback1 = () => numberOfTimesCalled1++;
+
+      var numberOfTimesCalled2 = 0;
+      var callback2 = () => numberOfTimesCalled2++;
+
+      var numberOfTimesCalled3 = 0;
+      var callback3 = () => numberOfTimesCalled3++;
+
+      var numberOfTimesCalled4 = 0;
+      var callback4 = () => numberOfTimesCalled4++;
+
+      promiseMock.finally(callback1);
+      promiseMock.finally(callback2);
+      promiseMock.finally(callback3);
+      promiseMock.finally(callback4);
+
+      // Act
+      promiseMock.reject();
+
+      // Assert
+      expect(numberOfTimesCalled1).to.be.equal(1);
+      expect(numberOfTimesCalled2).to.be.equal(1);
+      expect(numberOfTimesCalled3).to.be.equal(1);
+      expect(numberOfTimesCalled4).to.be.equal(1);
+    });
+
+    it('finally - resolve and then register finally callback, should call the callback', () => {
+      // Arrange
+      var numberOfTimesCalled = 0;
+      var callback = () => numberOfTimesCalled++;
+
+      // Act
+      promiseMock.resolve();
+      promiseMock.finally(callback);
+
+      // Assert
+      expect(numberOfTimesCalled).to.be.equal(1);
+    });
+
+    it('finally - resolving with data should resolve the returned promise with same data', () => {
+      // Arrange
+      var data = {};
+
+      var numberOfTimesCalled1 = 0;
+      var callback1 = () => {
+        numberOfTimesCalled1++;
+      }
+
+      var numberOfTimesCalled2 = 0;
+      var callback2 = (_data) => {
+        numberOfTimesCalled2++;
+        expect(_data).to.be.equal(data);
+      }
+
+      promiseMock.finally(callback1)
+        .success(callback2);
+
+      // Act
+      promiseMock.resolve(data);
+
+      // Assert
+      expect(numberOfTimesCalled1).to.be.equal(1);
+      expect(numberOfTimesCalled2).to.be.equal(1);
+    });
+
+    it('finally - rejecting with error should reject the returned promise with same error', () => {
+      // Arrange
+      var error = {};
+
+      var numberOfTimesCalled1 = 0;
+      var callback1 = () => {
+        numberOfTimesCalled1++;
+      }
+
+      var numberOfTimesCalled2 = 0;
+      var callback2 = (_data) => {
+        numberOfTimesCalled2++;
+        expect(_data).to.be.equal(error);
+      }
+
+      promiseMock.finally(callback1)
+        .catch(callback2);
+
+      // Act
+      promiseMock.reject(error);
+
+      // Assert
+      expect(numberOfTimesCalled1).to.be.equal(1);
+      expect(numberOfTimesCalled2).to.be.equal(1);
+    });
+
+    it('finally - success callback throws error should still call the finally callback', () => {
+      // Arrange
+      var successCallback = () => { throw ''; }
+
+      var numberOfTimesCalled = 0;
+      var finallyCallback = () => numberOfTimesCalled++;
+
+      promiseMock.success(successCallback);
+      promiseMock.finally(finallyCallback);
+
+      // Act
+      promiseMock.resolve();
+
+      // Assert
+      expect(numberOfTimesCalled).to.be.equal(1);
+    });
+
+    it('finally - catch callback throws error should still call the finally callback', () => {
+      // Arrange
+      var catchCallback = () => { throw ''; }
+
+      var numberOfTimesCalled = 0;
+      var finallyCallback = () => numberOfTimesCalled++;
+
+      promiseMock.catch(catchCallback);
+      promiseMock.finally(finallyCallback);
+
+      // Act
+      promiseMock.resolve();
+
+      // Assert
+      expect(numberOfTimesCalled).to.be.equal(1);
+    });
+
+    it('finally - success callback throws error should still call the returned promise finally callback', () => {
+      // Arrange
+      var successCallback = () => { throw ''; }
+
+      var numberOfTimesCalled = 0;
+      var finallyCallback = () => numberOfTimesCalled++;
+
+      promiseMock.success(successCallback)
+        .finally(finallyCallback);
+
+      // Act
+      promiseMock.resolve();
+
+      // Assert
+      expect(numberOfTimesCalled).to.be.equal(1);
+    });
+
+    it('finally - catch callback throws error should still call the returned promise finally callback', () => {
+      // Arrange
+      var catchCallback = () => { throw ''; }
+
+      var numberOfTimesCalled = 0;
+      var finallyCallback = () => numberOfTimesCalled++;
+
+      promiseMock.catch(catchCallback)
+        .finally(finallyCallback);
+
+      // Act
+      promiseMock.reject();
+
+      // Assert
+      expect(numberOfTimesCalled).to.be.equal(1);
+    });
+
+    it('finally - register finally, resolve promise, register another finally, should not call first callback on the second time', () => {
+      // Arrange
+      var numberOfTimesCalled = 0;
+      var finallyCallback = () => numberOfTimesCalled++;
+
+      // Act
+      promiseMock.finally(finallyCallback);
+      promiseMock.resolve();
+
+      expect(numberOfTimesCalled).to.be.equal(1);
+
+      promiseMock.finally(() => { });
+
+      // Assert
+      expect(numberOfTimesCalled).to.be.equal(1);
+    });
+
+    it('finally - register finally, reject promise, register another finally, should not call first callback on the second time', () => {
+      // Arrange
+      var numberOfTimesCalled = 0;
+      var finallyCallback = () => numberOfTimesCalled++;
+
+      // Act
+      promiseMock.finally(finallyCallback);
+      promiseMock.reject();
+
+      expect(numberOfTimesCalled).to.be.equal(1);
+
+      promiseMock.finally(() => { });
+
+      // Assert
+      expect(numberOfTimesCalled).to.be.equal(1);
+    });
+
+    it('finally - register finally, return promise from callback, register success after finally, the success will be called after the returned promise is resolved', () => {
+      // Arrange
+      var finallyReturnedPromiseMock = new PromiseMock<any>();
+      var finallyCallback = () => finallyReturnedPromiseMock;
+
+      var data = 111;
+
+      var numberOfTimesCalled = 0;
+      var successCallback = (_data) => {
+        numberOfTimesCalled++;
+        expect(_data).to.be.equal(data);
+      }
+
+      // Act
+      promiseMock.finally(finallyCallback)
+        .success(successCallback);
+
+      promiseMock.resolve(data);
+      expect(numberOfTimesCalled).to.be.equal(0);
+
+      finallyReturnedPromiseMock.resolve();
+
+      // Assert
+      expect(numberOfTimesCalled).to.be.equal(1);
+    });
+
+    it('finally - register finally, return promise from callback, register success after finally, the success will be called after the returned promise is rejected', () => {
+      // Arrange
+      var finallyReturnedPromiseMock = new PromiseMock<any>();
+      var finallyCallback = () => finallyReturnedPromiseMock;
+
+      var data = 111;
+
+      var numberOfTimesCalled = 0;
+      var successCallback = (_data) => {
+        numberOfTimesCalled++;
+        expect(_data).to.be.equal(data);
+      }
+
+      // Act
+      promiseMock.finally(finallyCallback)
+        .success(successCallback);
+
+      promiseMock.resolve(data);
+      expect(numberOfTimesCalled).to.be.equal(0);
+
+      finallyReturnedPromiseMock.reject();
+
+      // Assert
+      expect(numberOfTimesCalled).to.be.equal(1);
+    });
+
+    it('finally - register finally, return promise from callback, register catch after finally, the catch will be called after the returned promise is resolved', () => {
+      // Arrange
+      var finallyReturnedPromiseMock = new PromiseMock<any>();
+      var finallyCallback = () => finallyReturnedPromiseMock;
+
+      var error = 111;
+
+      var numberOfTimesCalled = 0;
+      var catchCallback = (_error) => {
+        numberOfTimesCalled++;
+        expect(_error).to.be.equal(error);
+      }
+
+      // Act
+      promiseMock.finally(finallyCallback)
+        .catch(catchCallback);
+
+      promiseMock.reject(error);
+      expect(numberOfTimesCalled).to.be.equal(0);
+
+      finallyReturnedPromiseMock.resolve();
+
+      // Assert
+      expect(numberOfTimesCalled).to.be.equal(1);
+    });
+
+    it('finally - register finally, return promise from callback, register catch after finally, the catch will be called after the returned promise is rejected', () => {
+      // Arrange
+      var finallyReturnedPromiseMock = new PromiseMock<any>();
+      var finallyCallback = () => finallyReturnedPromiseMock;
+
+      var error = 111;
+
+      var numberOfTimesCalled = 0;
+      var catchCallback = (_error) => {
+        numberOfTimesCalled++;
+        expect(_error).to.be.equal(error);
+      }
+
+      // Act
+      promiseMock.finally(finallyCallback)
+        .catch(catchCallback);
+
+      promiseMock.reject(error);
+      expect(numberOfTimesCalled).to.be.equal(0);
+
+      finallyReturnedPromiseMock.reject();
+
+      // Assert
+      expect(numberOfTimesCalled).to.be.equal(1);
     });
   });
 });

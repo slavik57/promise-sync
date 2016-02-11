@@ -20,18 +20,18 @@ export class PromiseMock<T> {
   }
 
   public resolve(data?: T): void {
-    if (!this._isPending()) {
+    if (!this.isPending()) {
       throw new Error('Cannot resolve not pending promise');
     }
 
     this._resolvedData = data;
-    this._state = PromiseState.Resolved;
+    this._state = PromiseState.Fulfilled;
 
     this._resolveCallbaks(data);
   }
 
   public reject(reason?: any): void {
-    if (!this._isPending()) {
+    if (!this.isPending()) {
       throw new Error('Cannot reject not pending promise');
     }
 
@@ -48,7 +48,7 @@ export class PromiseMock<T> {
 
     this._callbacks.push(callback);
 
-    if (this._isResolved()) {
+    if (this.isFulfilled()) {
       this._resolveCallbaks(this._resolvedData);
     }
 
@@ -63,32 +63,51 @@ export class PromiseMock<T> {
 
     this._callbacks.push(callback);
 
-    if (this._isRejected()) {
+    if (this.isRejected()) {
       this._rejectCallbacks(this._rejectedReason);
     }
 
     return callback.nextPromise;
   }
 
-  private _isPending(): boolean {
+  public then(successCallback: ISuccessCallback<T>, failureCallback: IFailureCallback<T>): PromiseMock<T> {
+    // TODO: Implement
+    throw "implement";
+  }
+
+  public finally(successCallback: () => any): PromiseMock<T> {
+    var callback: ICallback<T> = {
+      finally: successCallback,
+      nextPromise: new PromiseMock<T>()
+    };
+
+    this._callbacks.push(callback);
+
+    if (!this.isPending()) {
+      this._callFinallyCallbacks();
+    }
+
+    return callback.nextPromise;
+  }
+
+  public isPending(): boolean {
     return this.state === PromiseState.Pending;
   }
 
-  private _isResolved(): boolean {
-    return this.state === PromiseState.Resolved;
+  public isFulfilled(): boolean {
+    return this.state === PromiseState.Fulfilled;
   }
 
-  private _isRejected(): boolean {
+  public isRejected(): boolean {
     return this.state === PromiseState.Rejected;
   }
 
   private _resolveCallbaks(data: T): void {
     this._callbacks.forEach((_callback: ICallback<T>) =>
       this._resolveCallback(_callback, data));
-  }
 
-  private _isNullOrUndefined(obj: any): boolean {
-    return obj === null || obj === undefined;
+    this._callFinallyCallbacksAsResolved(data);
+    this._clearCallbacks();
   }
 
   private _resolveCallback(callback: ICallback<T>, data: T): void {
@@ -116,6 +135,9 @@ export class PromiseMock<T> {
   private _rejectCallbacks(error: any): void {
     this._callbacks.forEach((_callback: ICallback<T>) =>
       this._rejectCallback(_callback, error));
+
+    this._callFinallyCallbacksAsRejected(error);
+    this._clearCallbacks();
   }
 
   private _rejectCallback(callback: ICallback<T>, error: any): void {
@@ -128,5 +150,79 @@ export class PromiseMock<T> {
     } catch (e) {
       callback.nextPromise.reject(e);
     }
+  }
+
+  private _callFinallyCallbacks(): void {
+    this._callbacks.forEach((_callback: ICallback<T>) =>
+      this._callFinallyCallback(_callback));
+
+    this._clearCallbacks();
+  }
+
+  private _callFinallyCallbacksAsResolved(data: T): void {
+    this._callbacks.forEach((_callback: ICallback<T>) => {
+      this._callFinallyCallbackAndThenPerformAction(_callback,
+        () => this._resolveFinallyCallbackNextCallbackWithData(_callback, data));
+    });
+  }
+
+  private _callFinallyCallbacksAsRejected(error: any): void {
+    this._callbacks.forEach((_callback: ICallback<T>) => {
+      this._callFinallyCallbackAndThenPerformAction(_callback,
+        () => this._rejectFinallyCallbackNextCallbackWithError(_callback, error));
+    });
+  }
+
+  private _callFinallyCallbackAndThenPerformAction(callback: ICallback<T>, action: () => void): void {
+    var result: any = this._callFinallyCallback(callback);
+
+    if (result instanceof PromiseMock) {
+      var promiseResult = <PromiseMock<any>>result;
+
+      promiseResult.finally(action);
+    } else {
+      action();
+    }
+  }
+
+  private _callFinallyCallback(callback: ICallback<T>): any {
+    if (!callback.finally) {
+      return;
+    }
+
+    try {
+      return callback.finally();
+    } catch (e) {
+    }
+  }
+
+  private _resolveFinallyCallbackNextCallbackWithData(callback: ICallback<T>, data: T): void {
+    if (!callback.finally) {
+      return;
+    }
+
+    try {
+      callback.nextPromise.resolve(data);
+    } catch (e) {
+    }
+  }
+
+  private _rejectFinallyCallbackNextCallbackWithError(callback: ICallback<T>, error: any): void {
+    if (!callback.finally) {
+      return;
+    }
+
+    try {
+      callback.nextPromise.reject(error);
+    } catch (e) {
+    }
+  }
+
+  private _clearCallbacks(): void {
+    this._callbacks = [];
+  }
+
+  private _isNullOrUndefined(obj: any): boolean {
+    return obj === null || obj === undefined;
   }
 }

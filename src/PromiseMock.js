@@ -13,15 +13,15 @@ var PromiseMock = (function () {
         configurable: true
     });
     PromiseMock.prototype.resolve = function (data) {
-        if (!this._isPending()) {
+        if (!this.isPending()) {
             throw new Error('Cannot resolve not pending promise');
         }
         this._resolvedData = data;
-        this._state = PromiseState_1.PromiseState.Resolved;
+        this._state = PromiseState_1.PromiseState.Fulfilled;
         this._resolveCallbaks(data);
     };
     PromiseMock.prototype.reject = function (reason) {
-        if (!this._isPending()) {
+        if (!this.isPending()) {
             throw new Error('Cannot reject not pending promise');
         }
         this._state = PromiseState_1.PromiseState.Rejected;
@@ -33,7 +33,7 @@ var PromiseMock = (function () {
             nextPromise: new PromiseMock()
         };
         this._callbacks.push(callback);
-        if (this._isResolved()) {
+        if (this.isFulfilled()) {
             this._resolveCallbaks(this._resolvedData);
         }
         return callback.nextPromise;
@@ -44,18 +44,32 @@ var PromiseMock = (function () {
             nextPromise: new PromiseMock()
         };
         this._callbacks.push(callback);
-        if (this._isRejected()) {
+        if (this.isRejected()) {
             this._rejectCallbacks(this._rejectedReason);
         }
         return callback.nextPromise;
     };
-    PromiseMock.prototype._isPending = function () {
+    PromiseMock.prototype.then = function (successCallback, failureCallback) {
+        throw "implement";
+    };
+    PromiseMock.prototype.finally = function (successCallback) {
+        var callback = {
+            finally: successCallback,
+            nextPromise: new PromiseMock()
+        };
+        this._callbacks.push(callback);
+        if (!this.isPending()) {
+            this._callFinallyCallbacks();
+        }
+        return callback.nextPromise;
+    };
+    PromiseMock.prototype.isPending = function () {
         return this.state === PromiseState_1.PromiseState.Pending;
     };
-    PromiseMock.prototype._isResolved = function () {
-        return this.state === PromiseState_1.PromiseState.Resolved;
+    PromiseMock.prototype.isFulfilled = function () {
+        return this.state === PromiseState_1.PromiseState.Fulfilled;
     };
-    PromiseMock.prototype._isRejected = function () {
+    PromiseMock.prototype.isRejected = function () {
         return this.state === PromiseState_1.PromiseState.Rejected;
     };
     PromiseMock.prototype._resolveCallbaks = function (data) {
@@ -63,9 +77,8 @@ var PromiseMock = (function () {
         this._callbacks.forEach(function (_callback) {
             return _this._resolveCallback(_callback, data);
         });
-    };
-    PromiseMock.prototype._isNullOrUndefined = function (obj) {
-        return obj === null || obj === undefined;
+        this._callFinallyCallbacksAsResolved(data);
+        this._clearCallbacks();
     };
     PromiseMock.prototype._resolveCallback = function (callback, data) {
         if (!callback.success) {
@@ -93,6 +106,8 @@ var PromiseMock = (function () {
         this._callbacks.forEach(function (_callback) {
             return _this._rejectCallback(_callback, error);
         });
+        this._callFinallyCallbacksAsRejected(error);
+        this._clearCallbacks();
     };
     PromiseMock.prototype._rejectCallback = function (callback, error) {
         if (!callback.failure) {
@@ -104,6 +119,71 @@ var PromiseMock = (function () {
         catch (e) {
             callback.nextPromise.reject(e);
         }
+    };
+    PromiseMock.prototype._callFinallyCallbacks = function () {
+        var _this = this;
+        this._callbacks.forEach(function (_callback) {
+            return _this._callFinallyCallback(_callback);
+        });
+        this._clearCallbacks();
+    };
+    PromiseMock.prototype._callFinallyCallbacksAsResolved = function (data) {
+        var _this = this;
+        this._callbacks.forEach(function (_callback) {
+            _this._callFinallyCallbackAndThenPerformAction(_callback, function () { return _this._resolveFinallyCallbackNextCallbackWithData(_callback, data); });
+        });
+    };
+    PromiseMock.prototype._callFinallyCallbacksAsRejected = function (error) {
+        var _this = this;
+        this._callbacks.forEach(function (_callback) {
+            _this._callFinallyCallbackAndThenPerformAction(_callback, function () { return _this._rejectFinallyCallbackNextCallbackWithError(_callback, error); });
+        });
+    };
+    PromiseMock.prototype._callFinallyCallbackAndThenPerformAction = function (callback, action) {
+        var result = this._callFinallyCallback(callback);
+        if (result instanceof PromiseMock) {
+            var promiseResult = result;
+            promiseResult.finally(action);
+        }
+        else {
+            action();
+        }
+    };
+    PromiseMock.prototype._callFinallyCallback = function (callback) {
+        if (!callback.finally) {
+            return;
+        }
+        try {
+            return callback.finally();
+        }
+        catch (e) {
+        }
+    };
+    PromiseMock.prototype._resolveFinallyCallbackNextCallbackWithData = function (callback, data) {
+        if (!callback.finally) {
+            return;
+        }
+        try {
+            callback.nextPromise.resolve(data);
+        }
+        catch (e) {
+        }
+    };
+    PromiseMock.prototype._rejectFinallyCallbackNextCallbackWithError = function (callback, error) {
+        if (!callback.finally) {
+            return;
+        }
+        try {
+            callback.nextPromise.reject(error);
+        }
+        catch (e) {
+        }
+    };
+    PromiseMock.prototype._clearCallbacks = function () {
+        this._callbacks = [];
+    };
+    PromiseMock.prototype._isNullOrUndefined = function (obj) {
+        return obj === null || obj === undefined;
     };
     return PromiseMock;
 }());
