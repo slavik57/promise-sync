@@ -1,7 +1,7 @@
+import {PromiseState} from './enums/PromiseState';
+import {ICallback} from './interfaces/ICallback';
 import {ISuccessCallback} from './interfaces/ISuccessCallback';
 import {IFailureCallback} from './interfaces/IFailureCallback';
-import {ICallback} from './interfaces/ICallback';
-import {PromiseState} from './enums/PromiseState';
 
 export class PromiseMock<T> {
   private _callbacks: ICallback<T>[];

@@ -1,5 +1,5 @@
-export enum PromiseState {
-  Pending,
-  Fulfilled,
-  Rejected
-}
+  export enum PromiseState {
+    Pending,
+    Fulfilled,
+    Rejected
+  }
