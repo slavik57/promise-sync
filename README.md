@@ -31,7 +31,7 @@ Well, it was developed by me using TDD and checking the behaviour of a real prom
 ## Usage examples:
 
 ###### Typescript:
-'''typescript
+```typescript
 import { PromiseMock } from 'promise-sync';
 
 var promiseMock = new PromiseMock<number>();
@@ -56,10 +56,10 @@ var isFulfilled = promiseMock.isFulfilled();
 var isRejected = promiseMock.isRejected();
 
 var state: PromiseState = promiseMock.state;
-'''
+```
 
 ###### Same example using javascript
-'''javascript
+```javascript
 var promise_sync = require('promise-sync');
 var PromiseMock = promise_sync.PromiseMock;
 
@@ -85,4 +85,4 @@ var isFulfilled = promiseMock.isFulfilled();
 var isRejected = promiseMock.isRejected();
 
 var state = promiseMock.state;
-'''
+```
