@@ -27,7 +27,7 @@ export class PromiseMock<T> {
     this._resolvedData = data;
     this._state = PromiseState.Fulfilled;
 
-    this._resolveCallbaks(data);
+    this._resolveCallbacks(data);
   }
 
   public reject(reason?: any): void {
@@ -40,25 +40,25 @@ export class PromiseMock<T> {
     this._rejectCallbacks(reason);
   }
 
-  public success(successCallback: ISuccessCallback<T>): PromiseMock<T> {
+  public success<U>(successCallback: ISuccessCallback<T, U>): PromiseMock<U> {
     var callback: ICallback<T> = {
       success: successCallback,
-      nextPromise: new PromiseMock<T>()
+      nextPromise: new PromiseMock<U>()
     }
 
     this._callbacks.push(callback);
 
     if (this.isFulfilled()) {
-      this._resolveCallbaks(this._resolvedData);
+      this._resolveCallbacks(this._resolvedData);
     }
 
     return callback.nextPromise;
   }
 
-  public catch(failureCallback: IFailureCallback<T>): PromiseMock<T> {
+  public catch(failureCallback: IFailureCallback<T>): PromiseMock<any> {
     var callback: ICallback<T> = {
       failure: failureCallback,
-      nextPromise: new PromiseMock<T>()
+      nextPromise: new PromiseMock<any>()
     }
 
     this._callbacks.push(callback);
@@ -70,9 +70,24 @@ export class PromiseMock<T> {
     return callback.nextPromise;
   }
 
-  public then(successCallback: ISuccessCallback<T>, failureCallback: IFailureCallback<T>): PromiseMock<T> {
-    // TODO: Implement
-    throw "implement";
+  public then<U>(successCallback: ISuccessCallback<T, U>, failureCallback?: IFailureCallback<T>): PromiseMock<U> {
+    var callback: ICallback<T> = {
+      success: successCallback,
+      failure: failureCallback,
+      nextPromise: new PromiseMock<U>()
+    }
+
+    this._callbacks.push(callback);
+
+    if (this.isFulfilled()) {
+      this._resolveCallbacks(this._resolvedData);
+    }
+
+    if (this.isRejected()) {
+      this._rejectCallbacks(this._rejectedReason);
+    }
+
+    return callback.nextPromise;
   }
 
   public finally(successCallback: () => any): PromiseMock<T> {
@@ -102,7 +117,7 @@ export class PromiseMock<T> {
     return this.state === PromiseState.Rejected;
   }
 
-  private _resolveCallbaks(data: T): void {
+  private _resolveCallbacks(data: T): void {
     this._callbacks.forEach((_callback: ICallback<T>) =>
       this._resolveCallback(_callback, data));
 
@@ -125,8 +140,7 @@ export class PromiseMock<T> {
 
     if (result instanceof PromiseMock) {
       var promiseResult = <PromiseMock<any>>result;
-      promiseResult.success(_data => callback.nextPromise.resolve(_data));
-      promiseResult.catch(_error => callback.nextPromise.reject(_error));
+      promiseResult.finally(() => callback.nextPromise.resolve(data));
     } else {
       callback.nextPromise.resolve(result);
     }
@@ -145,10 +159,19 @@ export class PromiseMock<T> {
       return;
     }
 
+    var result: any;
     try {
-      callback.failure(error);
+      result = callback.failure(error);
     } catch (e) {
       callback.nextPromise.reject(e);
+      return;
+    }
+
+    if (result instanceof PromiseMock) {
+      var promiseResult = <PromiseMock<any>>result;
+      promiseResult.finally(() => callback.nextPromise.reject(error));
+    } else {
+      callback.nextPromise.resolve(result);
     }
   }
 

@@ -3,9 +3,9 @@ import {IFailureCallback} from './IFailureCallback';
 import {PromiseMock} from '../PromiseMock';
 
 export interface ICallback<T> {
-  success?: ISuccessCallback<T>;
-  failure?: IFailureCallback<T>;
+  success?: ISuccessCallback<T, any>;
+  failure?: IFailureCallback<any>;
   finally?: () => any;
 
-  nextPromise: PromiseMock<T>;
+  nextPromise: PromiseMock<any>;
 }

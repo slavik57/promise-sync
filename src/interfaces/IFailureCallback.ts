@@ -1,3 +1,3 @@
 export interface IFailureCallback<T> {
-  (error: any): void;
+  (error: T): any;
 }

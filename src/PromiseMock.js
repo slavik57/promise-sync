@@ -18,7 +18,7 @@ var PromiseMock = (function () {
         }
         this._resolvedData = data;
         this._state = PromiseState_1.PromiseState.Fulfilled;
-        this._resolveCallbaks(data);
+        this._resolveCallbacks(data);
     };
     PromiseMock.prototype.reject = function (reason) {
         if (!this.isPending()) {
@@ -34,7 +34,7 @@ var PromiseMock = (function () {
         };
         this._callbacks.push(callback);
         if (this.isFulfilled()) {
-            this._resolveCallbaks(this._resolvedData);
+            this._resolveCallbacks(this._resolvedData);
         }
         return callback.nextPromise;
     };
@@ -50,7 +50,19 @@ var PromiseMock = (function () {
         return callback.nextPromise;
     };
     PromiseMock.prototype.then = function (successCallback, failureCallback) {
-        throw "implement";
+        var callback = {
+            success: successCallback,
+            failure: failureCallback,
+            nextPromise: new PromiseMock()
+        };
+        this._callbacks.push(callback);
+        if (this.isFulfilled()) {
+            this._resolveCallbacks(this._resolvedData);
+        }
+        if (this.isRejected()) {
+            this._rejectCallbacks(this._rejectedReason);
+        }
+        return callback.nextPromise;
     };
     PromiseMock.prototype.finally = function (successCallback) {
         var callback = {
@@ -72,7 +84,7 @@ var PromiseMock = (function () {
     PromiseMock.prototype.isRejected = function () {
         return this.state === PromiseState_1.PromiseState.Rejected;
     };
-    PromiseMock.prototype._resolveCallbaks = function (data) {
+    PromiseMock.prototype._resolveCallbacks = function (data) {
         var _this = this;
         this._callbacks.forEach(function (_callback) {
             return _this._resolveCallback(_callback, data);
@@ -94,8 +106,7 @@ var PromiseMock = (function () {
         }
         if (result instanceof PromiseMock) {
             var promiseResult = result;
-            promiseResult.success(function (_data) { return callback.nextPromise.resolve(_data); });
-            promiseResult.catch(function (_error) { return callback.nextPromise.reject(_error); });
+            promiseResult.finally(function () { return callback.nextPromise.resolve(data); });
         }
         else {
             callback.nextPromise.resolve(result);
@@ -113,11 +124,20 @@ var PromiseMock = (function () {
         if (!callback.failure) {
             return;
         }
+        var result;
         try {
-            callback.failure(error);
+            result = callback.failure(error);
         }
         catch (e) {
             callback.nextPromise.reject(e);
+            return;
+        }
+        if (result instanceof PromiseMock) {
+            var promiseResult = result;
+            promiseResult.finally(function () { return callback.nextPromise.reject(error); });
+        }
+        else {
+            callback.nextPromise.resolve(result);
         }
     };
     PromiseMock.prototype._callFinallyCallbacks = function () {

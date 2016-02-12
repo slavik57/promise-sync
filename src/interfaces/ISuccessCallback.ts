@@ -1,3 +1,3 @@
-export interface ISuccessCallback<T> {
-  (data: T): any;
+export interface ISuccessCallback<T, U> {
+  (data: T): U;
 }
