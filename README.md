@@ -37,7 +37,7 @@ Well, it was developed by me using TDD and checking the behaviour of a real prom
 
 ###### Typescript:
 ```typescript
-import { PromiseMock } from 'promise-sync';
+import { PromiseMock, PromiseState } from 'promise-sync';
 
 var promiseMock = new PromiseMock<number>();
 
@@ -67,6 +67,7 @@ var state: PromiseState = promiseMock.state;
 ```javascript
 var promise_sync = require('promise-sync');
 var PromiseMock = promise_sync.PromiseMock;
+var PromiseState = promise_sync.PromiseState;
 
 var promiseMock = new PromiseMock();
 
