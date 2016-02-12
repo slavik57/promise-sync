@@ -2,7 +2,9 @@
 Synchronious promise for making testing experience much easier.
 
 ## Installation
+```
 $ npm install promise-sync
+```
 
 ## Why?
 - Did you ever need to use setTimeout just to make sure the async logic
