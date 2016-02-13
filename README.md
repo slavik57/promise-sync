@@ -1,5 +1,5 @@
 # promise-sync
-Synchronious promise for making testing experience much easier.
+Synchronous promise for making testing experience much easier.
 
 ## Installation
 ```
@@ -31,7 +31,7 @@ Well, it was developed by me using TDD and checking the behaviour of a real prom
 - Resolving or rejecting not pending promise will throw error
 - Subscrining to resolved promise will raise proper callbacks
 - Subscrining to rejected promise will raise proper callbacks
-- **Synchronious!**
+- **Synchronous!**
 
 ## Usage examples:
 
