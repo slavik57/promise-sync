@@ -43,7 +43,7 @@ var promiseMock = new PromiseMock<number>();
 
 var onSuccessCallback = () => console.log('success');
 var onFailureCallback = () => console.log('failure');
-var finallyCallback = () => console.log('failure');
+var finallyCallback = () => console.log('finally');
 
 promiseMock.then(onSuccessCallback, onFailureCallback)
            .success(onSuccessCallback)
@@ -73,7 +73,7 @@ var promiseMock = new PromiseMock();
 
 var onSuccessCallback = function() { console.log('success'); }
 var onFailureCallback = function() { console.log('failure'); }
-var finallyCallback = function() { onsole.log('failure'); }
+var finallyCallback = function() { onsole.log('finally'); }
 
 promiseMock.then(onSuccessCallback, onFailureCallback)
            .success(onSuccessCallback)
