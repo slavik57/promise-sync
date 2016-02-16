@@ -5,3 +5,4 @@ tsconfig.json
 typings.json
 *.ts
 !*.d.ts
+.npmignore
