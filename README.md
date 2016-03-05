@@ -94,7 +94,7 @@ var state = promiseMock.state;
 ```
 
 ## Be aware!
-The methods: 'then/success/catch/finall' catch exceptions thrown in the callbacks.
+The methods: 'then/success/catch/finally' catch exceptions thrown in the callbacks.
 So if you want to do assertions inside of them you need to tell the PromiseMock to ignore assertion error exceptions,
 otherwise the tests will pass even though the assertions are failing
 
