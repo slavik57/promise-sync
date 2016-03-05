@@ -28,12 +28,12 @@
         "src/interfaces/IFailureCallback.ts",
         "src/interfaces/ISuccessCallback.ts",
         "src/PromiseMock.ts",
-        "tests/PromiseMockTest.d.ts",
         "tests/PromiseMockTest.ts",
         "typings/main.d.ts"
     ],
     "exclude": [
         "src/**/*.d.ts",
+        "tests/**/*.d.ts",
         "index.d.ts",
         "typings/browser.d.ts",
         "typings/browser",
