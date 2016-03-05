@@ -1,6 +1,6 @@
 {
   "name": "promise-sync",
-  "version": "0.1.9",
+  "version": "0.1.91",
   "description": "synchronous promise stub",
   "main": "src/index.js",
   "scripts": {

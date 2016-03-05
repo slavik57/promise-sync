@@ -103,7 +103,7 @@ If you are using chai for example:
 ###### Typescript:
 ```typescript
 import { AssertionError } from 'chai';
-import { PromiseMock } from '../index';
+import { PromiseMock } from 'promise-sync';
 
 PromiseMock.setAssertionExceptionTypes([AssertionError]);
 ```
