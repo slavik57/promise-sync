@@ -1,6 +1,8 @@
-import { expect } from 'chai';
+import { expect, AssertionError } from 'chai';
 import * as sinon from 'sinon';
 import {PromiseState, PromiseMock} from '../index';
+
+PromiseMock.setAssertionExceptionTypes([AssertionError]);
 
 module Tests {
   enum CallbackType {

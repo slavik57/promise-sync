@@ -1,6 +1,7 @@
 "use strict";
 var chai_1 = require('chai');
 var index_1 = require('../index');
+index_1.PromiseMock.setAssertionExceptionTypes([chai_1.AssertionError]);
 var Tests;
 (function (Tests) {
     var CallbackType;

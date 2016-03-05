@@ -12,6 +12,10 @@ var PromiseMock = (function () {
         enumerable: true,
         configurable: true
     });
+    PromiseMock.setAssertionExceptionTypes = function (assertionExceptionTypes) {
+        this._assertionExceptionTypes = [];
+        this._assertionExceptionTypes.push.apply(this._assertionExceptionTypes, assertionExceptionTypes);
+    };
     PromiseMock.prototype.resolve = function (data) {
         if (!this.isPending()) {
             throw new Error('Cannot resolve not pending promise');
@@ -24,6 +28,7 @@ var PromiseMock = (function () {
         if (!this.isPending()) {
             throw new Error('Cannot reject not pending promise');
         }
+        this._rejectedReason = reason;
         this._state = PromiseState_1.PromiseState.Rejected;
         this._rejectCallbacks(reason);
     };
@@ -101,6 +106,7 @@ var PromiseMock = (function () {
             result = callback.success(data);
         }
         catch (e) {
+            this._throwIfAssertionExceptionType(e);
             callback.nextPromise.reject(e);
             return;
         }
@@ -129,6 +135,7 @@ var PromiseMock = (function () {
             result = callback.failure(error);
         }
         catch (e) {
+            this._throwIfAssertionExceptionType(e);
             callback.nextPromise.reject(e);
             return;
         }
@@ -177,6 +184,7 @@ var PromiseMock = (function () {
             return callback.finally();
         }
         catch (e) {
+            this._throwIfAssertionExceptionType(e);
         }
     };
     PromiseMock.prototype._resolveFinallyCallbackNextCallbackWithData = function (callback, data) {
@@ -187,6 +195,7 @@ var PromiseMock = (function () {
             callback.nextPromise.resolve(data);
         }
         catch (e) {
+            this._throwIfAssertionExceptionType(e);
         }
     };
     PromiseMock.prototype._rejectFinallyCallbackNextCallbackWithError = function (callback, error) {
@@ -197,6 +206,7 @@ var PromiseMock = (function () {
             callback.nextPromise.reject(error);
         }
         catch (e) {
+            this._throwIfAssertionExceptionType(e);
         }
     };
     PromiseMock.prototype._clearCallbacks = function () {
@@ -205,6 +215,14 @@ var PromiseMock = (function () {
     PromiseMock.prototype._isNullOrUndefined = function (obj) {
         return obj === null || obj === undefined;
     };
+    PromiseMock.prototype._throwIfAssertionExceptionType = function (error) {
+        PromiseMock._assertionExceptionTypes.forEach(function (type) {
+            if (error instanceof type) {
+                throw error;
+            }
+        });
+    };
+    PromiseMock._assertionExceptionTypes = [];
     return PromiseMock;
 }());
 exports.PromiseMock = PromiseMock;

@@ -4,6 +4,7 @@ import {ISuccessCallback} from './interfaces/ISuccessCallback';
 import {IFailureCallback} from './interfaces/IFailureCallback';
 
 export class PromiseMock<T> {
+  private static _assertionExceptionTypes = [];
   private _callbacks: ICallback<T>[];
   private _state: PromiseState;
 
@@ -17,6 +18,11 @@ export class PromiseMock<T> {
 
   public get state(): PromiseState {
     return this._state;
+  }
+
+  public static setAssertionExceptionTypes(assertionExceptionTypes: Function[]): void {
+    this._assertionExceptionTypes = [];
+    this._assertionExceptionTypes.push.apply(this._assertionExceptionTypes, assertionExceptionTypes);
   }
 
   public resolve(data?: T): void {
@@ -35,6 +41,7 @@ export class PromiseMock<T> {
       throw new Error('Cannot reject not pending promise');
     }
 
+    this._rejectedReason = reason;
     this._state = PromiseState.Rejected;
 
     this._rejectCallbacks(reason);
@@ -134,6 +141,7 @@ export class PromiseMock<T> {
     try {
       result = callback.success(data);
     } catch (e) {
+      this._throwIfAssertionExceptionType(e);
       callback.nextPromise.reject(e);
       return;
     }
@@ -163,6 +171,7 @@ export class PromiseMock<T> {
     try {
       result = callback.failure(error);
     } catch (e) {
+      this._throwIfAssertionExceptionType(e);
       callback.nextPromise.reject(e);
       return;
     }
@@ -216,6 +225,7 @@ export class PromiseMock<T> {
     try {
       return callback.finally();
     } catch (e) {
+      this._throwIfAssertionExceptionType(e);
     }
   }
 
@@ -227,6 +237,7 @@ export class PromiseMock<T> {
     try {
       callback.nextPromise.resolve(data);
     } catch (e) {
+      this._throwIfAssertionExceptionType(e);
     }
   }
 
@@ -238,6 +249,7 @@ export class PromiseMock<T> {
     try {
       callback.nextPromise.reject(error);
     } catch (e) {
+      this._throwIfAssertionExceptionType(e);
     }
   }
 
@@ -247,5 +259,13 @@ export class PromiseMock<T> {
 
   private _isNullOrUndefined(obj: any): boolean {
     return obj === null || obj === undefined;
+  }
+
+  private _throwIfAssertionExceptionType(error): void {
+    PromiseMock._assertionExceptionTypes.forEach((type: Function) => {
+      if (error instanceof type) {
+        throw error;
+      }
+    });
   }
 }

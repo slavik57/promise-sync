@@ -92,3 +92,27 @@ var isRejected = promiseMock.isRejected();
 
 var state = promiseMock.state;
 ```
+
+## Be aware!
+The methods: 'then/success/catch/finall' catch exceptions thrown in the callbacks.
+So if you want to do assertions inside of them you need to tell the PromiseMock to ignore assertion error exceptions,
+otherwise the tests will pass even though the assertions are failing
+
+If you are using chai for example:
+
+###### Typescript:
+```typescript
+import { AssertionError } from 'chai';
+import { PromiseMock } from '../index';
+
+PromiseMock.setAssertionExceptionTypes([AssertionError]);
+```
+
+###### Same example using javascript
+```javascript
+var chai = require('chai');
+var promise_sync = require('promise-sync');
+var PromiseMock = promise_sync.PromiseMock;
+
+PromiseMock.setAssertionExceptionTypes([chai.AssertionError]);
+```
