@@ -22,30 +22,26 @@
     "compileOnSave": true,
     "buildOnSave": false,
     "files": [
-        "index.d.ts",
         "index.ts",
-        "src/enums/PromiseState.d.ts",
         "src/enums/PromiseState.ts",
-        "src/interfaces/ICallback.d.ts",
         "src/interfaces/ICallback.ts",
-        "src/interfaces/IFailureCallback.d.ts",
         "src/interfaces/IFailureCallback.ts",
-        "src/interfaces/ISuccessCallback.d.ts",
         "src/interfaces/ISuccessCallback.ts",
-        "src/PromiseMock.d.ts",
         "src/PromiseMock.ts",
         "tests/PromiseMockTest.d.ts",
         "tests/PromiseMockTest.ts",
         "typings/main.d.ts"
     ],
     "exclude": [
+        "src/**/*.d.ts",
+        "index.d.ts",
         "typings/browser.d.ts",
         "typings/browser",
         "typings/main"
     ],
     "atom": {
         "rewriteTsconfig": true,
-        "formatOnSave": true
+        "formatOnSave": false
     },
     "formatCodeOptions": {
         "indentSize": 2,

@@ -2,12 +2,14 @@ import { PromiseState } from './enums/PromiseState';
 import { ISuccessCallback } from './interfaces/ISuccessCallback';
 import { IFailureCallback } from './interfaces/IFailureCallback';
 export declare class PromiseMock<T> {
+    private static _assertionExceptionTypes;
     private _callbacks;
     private _state;
     private _resolvedData;
     private _rejectedReason;
     constructor();
-    state: PromiseState;
+    readonly state: PromiseState;
+    static setAssertionExceptionTypes(assertionExceptionTypes: Function[]): void;
     resolve(data?: T): void;
     reject(reason?: any): void;
     success<U>(successCallback: ISuccessCallback<T, U>): PromiseMock<U>;
@@ -30,4 +32,5 @@ export declare class PromiseMock<T> {
     private _rejectFinallyCallbackNextCallbackWithError(callback, error);
     private _clearCallbacks();
     private _isNullOrUndefined(obj);
+    private _throwIfAssertionExceptionType(error);
 }
