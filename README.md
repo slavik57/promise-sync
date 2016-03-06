@@ -27,10 +27,14 @@ Well, it was developed by me using TDD and checking the behaviour of a real prom
 - Chaining callback subscriptions
 - Support state checking: state, isPending(), isRejected(), isFulfilled()
 - Support resolving and rejecting: resolve(data?), reject(reason?)
+- Make it possible to ignore assertion errors inside the success/failure/finally callbacks.
+- Create a resolved/rejected promise with one simple line.
+- Wait for all promises to resolve using PromiseMock.all() method.
+- Wait for one of the promises to resolve using PromiseMock.race() method.
 - Written in Typescript so its type-safe
 - Resolving or rejecting not pending promise will throw error
-- Subscrining to resolved promise will raise proper callbacks
-- Subscrining to rejected promise will raise proper callbacks
+- Subscribing to resolved promise will raise proper callbacks
+- Subscribing to rejected promise will raise proper callbacks
 - **Synchronous!**
 
 ## Usage examples:
@@ -52,7 +56,7 @@ promiseMock.then(onSuccessCallback, onFailureCallback)
 
 var dataToResolve = 123;
 promiseMock.resolve(dataToResolve);
-
+// Or:
 var errorToReject = 'some error';
 promiseMock.reject(errorToReject);
 
@@ -61,6 +65,15 @@ var isFulfilled = promiseMock.isFulfilled();
 var isRejected = promiseMock.isRejected();
 
 var state: PromiseState = promiseMock.state;
+
+var rejectedPromise: PromiseMock<string> = PromiseMock.reject('some error');
+var resolvedPromise: PromiseMock<string> = PromiseMock.resolve('some data');
+
+var waitForAll: PromiseMock<any[]> =
+  PromoseMock.all([rejectedPromise, resolvedPromise, 'random data that will be converted to resolved promise']);
+
+var waitForFirst: PromiseMock<any> =
+    PromoseMock.race([rejectedPromise, resolvedPromise, 'random data that will be converted to resolved promise']);
 ```
 
 ###### Same example using javascript
@@ -91,6 +104,15 @@ var isFulfilled = promiseMock.isFulfilled();
 var isRejected = promiseMock.isRejected();
 
 var state = promiseMock.state;
+
+var rejectedPromise = PromiseMock.reject('some error');
+var resolvedPromise = PromiseMock.resolve('some data');
+
+var waitForAll =
+  PromoseMock.all([rejectedPromise, resolvedPromise, 'random data that will be converted to resolved promise']);
+
+var waitForFirst =
+  PromoseMock.race([rejectedPromise, resolvedPromise, 'random data that will be converted to resolved promise']);
 ```
 
 ## Be aware!
