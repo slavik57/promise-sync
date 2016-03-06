@@ -69,11 +69,19 @@ var state: PromiseState = promiseMock.state;
 var rejectedPromise: PromiseMock<string> = PromiseMock.reject('some error');
 var resolvedPromise: PromiseMock<string> = PromiseMock.resolve('some data');
 
-var waitForAll: PromiseMock<any[]> =
-  PromoseMock.all([rejectedPromise, resolvedPromise, 'random data that will be converted to resolved promise']);
+var waitForAll: PromiseMock<any[]> = PromoseMock.all(
+  [
+    rejectedPromise,
+    resolvedPromise,
+    'random data that will be converted to resolved promise'
+  ]);
 
-var waitForFirst: PromiseMock<any> =
-    PromoseMock.race([rejectedPromise, resolvedPromise, 'random data that will be converted to resolved promise']);
+var waitForFirst: PromiseMock<any> = PromoseMock.race(
+  [
+    rejectedPromise,
+    resolvedPromise,
+    'random data that will be converted to resolved promise'
+  ]);
 ```
 
 ###### Same example using javascript
@@ -108,11 +116,19 @@ var state = promiseMock.state;
 var rejectedPromise = PromiseMock.reject('some error');
 var resolvedPromise = PromiseMock.resolve('some data');
 
-var waitForAll =
-  PromoseMock.all([rejectedPromise, resolvedPromise, 'random data that will be converted to resolved promise']);
+var waitForAll = PromoseMock.all(
+  [
+    rejectedPromise,
+    resolvedPromise,
+    'random data that will be converted to resolved promise'
+  ]);
 
-var waitForFirst =
-  PromoseMock.race([rejectedPromise, resolvedPromise, 'random data that will be converted to resolved promise']);
+var waitForFirst = PromoseMock.race(
+  [
+    rejectedPromise,
+    resolvedPromise,
+    'random data that will be converted to resolved promise'
+  ]);
 ```
 
 ## Be aware!
