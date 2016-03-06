@@ -1853,6 +1853,27 @@ var Tests;
                     }
                 ]);
             });
+            it('if all the promises reject, should reject correctly', function () {
+                var promiseToReject1 = new index_1.PromiseMock();
+                var promiseToReject2 = new index_1.PromiseMock();
+                var promiseToReject3 = new index_1.PromiseMock();
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var error1 = {};
+                var error2 = {};
+                var error3 = {};
+                index_1.PromiseMock.all([promiseToReject1, promiseToReject3, promiseToReject2]).catch(failureCallback);
+                promiseToReject2.reject(error2);
+                promiseToReject1.reject(error1);
+                promiseToReject3.reject(error3);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 1,
+                        data: error2
+                    }
+                ]);
+            });
             it('if all of the promises resolve, should resolve correctly', function () {
                 var promiseToResolve1 = new index_1.PromiseMock();
                 var promiseToResolve2 = new index_1.PromiseMock();
@@ -1909,6 +1930,27 @@ var Tests;
                         type: CallbackType.Failure,
                         callbackNumber: 1,
                         data: error
+                    }
+                ]);
+            });
+            it('if all the promises were rejected before calling the method, should reject', function () {
+                var promiseToReject1 = new index_1.PromiseMock();
+                var promiseToReject2 = new index_1.PromiseMock();
+                var promiseToReject3 = new index_1.PromiseMock();
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var error1 = {};
+                var error2 = {};
+                var error3 = {};
+                promiseToReject1.reject(error1);
+                promiseToReject2.reject(error2);
+                promiseToReject3.reject(error3);
+                index_1.PromiseMock.all([promiseToReject1, promiseToReject3, promiseToReject2]).catch(failureCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 1,
+                        data: error1
                     }
                 ]);
             });

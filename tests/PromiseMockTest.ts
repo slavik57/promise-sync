@@ -2848,6 +2848,35 @@ module Tests {
         ]);
       });
 
+      it('if all the promises reject, should reject correctly', () => {
+        // Arrange
+        var promiseToReject1 = new PromiseMock<any>();
+        var promiseToReject2 = new PromiseMock<any>();
+        var promiseToReject3 = new PromiseMock<any>();
+
+        var callbackRecords: ICallbackRecord[] = [];
+        var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+
+        var error1 = {};
+        var error2 = {};
+        var error3 = {};
+
+        // Act
+        PromiseMock.all([promiseToReject1, promiseToReject3, promiseToReject2]).catch(failureCallback);
+        promiseToReject2.reject(error2);
+        promiseToReject1.reject(error1);
+        promiseToReject3.reject(error3);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Failure,
+            callbackNumber: 1,
+            data: error2
+          }
+        ]);
+      });
+
       it('if all of the promises resolve, should resolve correctly', () => {
         // Arrange
         var promiseToResolve1 = new PromiseMock<any>();
@@ -2927,6 +2956,35 @@ module Tests {
             type: CallbackType.Failure,
             callbackNumber: 1,
             data: error
+          }
+        ]);
+      });
+
+      it('if all the promises were rejected before calling the method, should reject', () => {
+        // Arrange
+        var promiseToReject1 = new PromiseMock<any>();
+        var promiseToReject2 = new PromiseMock<any>();
+        var promiseToReject3 = new PromiseMock<any>();
+
+        var callbackRecords: ICallbackRecord[] = [];
+        var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+
+        var error1 = {};
+        var error2 = {};
+        var error3 = {};
+
+        // Act
+        promiseToReject1.reject(error1);
+        promiseToReject2.reject(error2);
+        promiseToReject3.reject(error3);
+        PromiseMock.all([promiseToReject1, promiseToReject3, promiseToReject2]).catch(failureCallback);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Failure,
+            callbackNumber: 1,
+            data: error1
           }
         ]);
       });
