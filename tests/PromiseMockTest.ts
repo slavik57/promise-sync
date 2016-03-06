@@ -2544,5 +2544,261 @@ module Tests {
         ]);
       });
     });
+
+    describe('static resolve', () => {
+      it('the returned promise state should be resolved', () => {
+        // Act
+        var promise: PromiseMock<any> = PromiseMock.resolve();
+
+        // Assert
+        expect(promise.state).to.equal(PromiseState.Fulfilled);
+      });
+
+      it('isFulfilled should be true', () => {
+        // Act
+        var promise: PromiseMock<any> = PromiseMock.resolve();
+
+        // Assert
+        expect(promise.isFulfilled()).to.equal(true);
+      });
+
+      it('isRejected should be false', () => {
+        // Act
+        var promise: PromiseMock<any> = PromiseMock.resolve();
+
+        // Assert
+        expect(promise.isRejected()).to.equal(false);
+      });
+
+      it('isPending should be false', () => {
+        // Act
+        var promise: PromiseMock<any> = PromiseMock.resolve();
+
+        // Assert
+        expect(promise.isPending()).to.equal(false);
+      });
+
+      it('call resolve should fail', () => {
+        // Act
+        var promise: PromiseMock<any> = PromiseMock.resolve();
+
+        // Assert
+        expect(() => promise.resolve()).to.throw(Error);
+      });
+
+      it('call reject should fail', () => {
+        // Act
+        var promise: PromiseMock<any> = PromiseMock.resolve();
+
+        // Assert
+        expect(() => promise.reject()).to.throw(Error);
+      });
+
+      it('subscribing with then should call the success callback', () => {
+        // Arrange
+        var callbackRecords: ICallbackRecord[] = [];
+
+        var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+
+        var failureCallback = createCallback(CallbackType.Failure, 2, callbackRecords);
+
+        var dataToResolve = {};
+        var promise: PromiseMock<any> = PromiseMock.resolve(dataToResolve);
+
+        // Act
+        promise.then(successCallback, failureCallback);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Success,
+            callbackNumber: 1,
+            data: dataToResolve
+          }
+        ]);
+      });
+
+      it('subscribing with success should call the success callback', () => {
+        // Arrange
+        var callbackRecords: ICallbackRecord[] = [];
+
+        var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+
+        var dataToResolve = {};
+        var promise: PromiseMock<any> = PromiseMock.resolve(dataToResolve);
+
+        // Act
+        promise.success(successCallback);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Success,
+            callbackNumber: 1,
+            data: dataToResolve
+          }
+        ]);
+      });
+
+      it('subscribing with catch should not call the failure callback', () => {
+        // Arrange
+        var callbackRecords: ICallbackRecord[] = [];
+
+        var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+
+        var dataToResolve = {};
+        var promise: PromiseMock<any> = PromiseMock.resolve(dataToResolve);
+
+        // Act
+        promise.catch(failureCallback);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([]);
+      });
+
+      it('subscribing with finally should call the callback', () => {
+        // Arrange
+        var numberOfTimesCalled = 0;
+
+        var finallyCallback = () => numberOfTimesCalled++
+
+        var dataToResolve = {};
+        var promise: PromiseMock<any> = PromiseMock.resolve(dataToResolve);
+
+        // Act
+        promise.finally(finallyCallback);
+
+        // Assert
+        expect(numberOfTimesCalled).to.be.eql(1);
+      });
+    });
+
+    describe('static reject', () => {
+      it('the returned promise state should be rejected', () => {
+        // Act
+        var promise: PromiseMock<any> = PromiseMock.reject();
+
+        // Assert
+        expect(promise.state).to.equal(PromiseState.Rejected);
+      });
+
+      it('isFulfilled should be false', () => {
+        // Act
+        var promise: PromiseMock<any> = PromiseMock.reject();
+
+        // Assert
+        expect(promise.isFulfilled()).to.equal(false);
+      });
+
+      it('isRejected should be true', () => {
+        // Act
+        var promise: PromiseMock<any> = PromiseMock.reject();
+
+        // Assert
+        expect(promise.isRejected()).to.equal(true);
+      });
+
+      it('isPending should be false', () => {
+        // Act
+        var promise: PromiseMock<any> = PromiseMock.reject();
+
+        // Assert
+        expect(promise.isPending()).to.equal(false);
+      });
+
+      it('call resolve should fail', () => {
+        // Act
+        var promise: PromiseMock<any> = PromiseMock.reject();
+
+        // Assert
+        expect(() => promise.resolve()).to.throw(Error);
+      });
+
+      it('call reject should fail', () => {
+        // Act
+        var promise: PromiseMock<any> = PromiseMock.reject();
+
+        // Assert
+        expect(() => promise.reject()).to.throw(Error);
+      });
+
+      it('subscribing with then should call the failure callback', () => {
+        // Arrange
+        var callbackRecords: ICallbackRecord[] = [];
+
+        var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+
+        var failureCallback = createCallback(CallbackType.Failure, 2, callbackRecords);
+
+        var error = {};
+        var promise: PromiseMock<any> = PromiseMock.reject(error);
+
+        // Act
+        promise.then(successCallback, failureCallback);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Failure,
+            callbackNumber: 2,
+            data: error
+          }
+        ]);
+      });
+
+      it('subscribing with success should not call the success callback', () => {
+        // Arrange
+        var callbackRecords: ICallbackRecord[] = [];
+
+        var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+
+        var error = {};
+        var promise: PromiseMock<any> = PromiseMock.reject(error);
+
+        // Act
+        promise.success(successCallback);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([]);
+      });
+
+      it('subscribing with catch should call the failure callback', () => {
+        // Arrange
+        var callbackRecords: ICallbackRecord[] = [];
+
+        var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+
+        var error = {};
+        var promise: PromiseMock<any> = PromiseMock.reject(error);
+
+        // Act
+        promise.catch(failureCallback);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Failure,
+            callbackNumber: 1,
+            data: error
+          }
+        ]);
+      });
+
+      it('subscribing with finally should call the callback', () => {
+        // Arrange
+        var numberOfTimesCalled = 0;
+
+        var finallyCallback = () => numberOfTimesCalled++;
+
+        var error = {};
+        var promise: PromiseMock<any> = PromiseMock.reject(error);
+
+        // Act
+        promise.finally(finallyCallback);
+
+        // Assert
+        expect(numberOfTimesCalled).to.be.eql(1);
+      });
+    });
   });
 }

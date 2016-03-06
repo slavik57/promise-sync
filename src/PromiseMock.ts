@@ -25,6 +25,20 @@ export class PromiseMock<T> {
     this._assertionExceptionTypes.push.apply(this._assertionExceptionTypes, assertionExceptionTypes);
   }
 
+  public static resolve<T>(data?: T): PromiseMock<T> {
+    var result = new PromiseMock<T>();
+    result.resolve(data);
+
+    return result;
+  }
+
+  public static reject<T>(error?: any): PromiseMock<T> {
+    var result = new PromiseMock<T>();
+    result.reject(error);
+
+    return result;
+  }
+
   public resolve(data?: T): void {
     if (!this.isPending()) {
       throw new Error('Cannot resolve not pending promise');

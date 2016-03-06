@@ -16,6 +16,16 @@ var PromiseMock = (function () {
         this._assertionExceptionTypes = [];
         this._assertionExceptionTypes.push.apply(this._assertionExceptionTypes, assertionExceptionTypes);
     };
+    PromiseMock.resolve = function (data) {
+        var result = new PromiseMock();
+        result.resolve(data);
+        return result;
+    };
+    PromiseMock.reject = function (error) {
+        var result = new PromiseMock();
+        result.reject(error);
+        return result;
+    };
     PromiseMock.prototype.resolve = function (data) {
         if (!this.isPending()) {
             throw new Error('Cannot resolve not pending promise');

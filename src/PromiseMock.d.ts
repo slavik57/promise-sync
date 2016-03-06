@@ -10,6 +10,8 @@ export declare class PromiseMock<T> {
     constructor();
     readonly state: PromiseState;
     static setAssertionExceptionTypes(assertionExceptionTypes: Function[]): void;
+    static resolve<T>(data?: T): PromiseMock<T>;
+    static reject<T>(error?: any): PromiseMock<T>;
     resolve(data?: T): void;
     reject(reason?: any): void;
     success<U>(successCallback: ISuccessCallback<T, U>): PromiseMock<U>;

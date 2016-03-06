@@ -41,7 +41,7 @@
     ],
     "atom": {
         "rewriteTsconfig": true,
-        "formatOnSave": false
+        "formatOnSave": true
     },
     "formatCodeOptions": {
         "indentSize": 2,

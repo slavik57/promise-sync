@@ -1682,5 +1682,147 @@ var Tests;
                 ]);
             });
         });
+        describe('static resolve', function () {
+            it('the returned promise state should be resolved', function () {
+                var promise = index_1.PromiseMock.resolve();
+                chai_1.expect(promise.state).to.equal(index_1.PromiseState.Fulfilled);
+            });
+            it('isFulfilled should be true', function () {
+                var promise = index_1.PromiseMock.resolve();
+                chai_1.expect(promise.isFulfilled()).to.equal(true);
+            });
+            it('isRejected should be false', function () {
+                var promise = index_1.PromiseMock.resolve();
+                chai_1.expect(promise.isRejected()).to.equal(false);
+            });
+            it('isPending should be false', function () {
+                var promise = index_1.PromiseMock.resolve();
+                chai_1.expect(promise.isPending()).to.equal(false);
+            });
+            it('call resolve should fail', function () {
+                var promise = index_1.PromiseMock.resolve();
+                chai_1.expect(function () { return promise.resolve(); }).to.throw(Error);
+            });
+            it('call reject should fail', function () {
+                var promise = index_1.PromiseMock.resolve();
+                chai_1.expect(function () { return promise.reject(); }).to.throw(Error);
+            });
+            it('subscribing with then should call the success callback', function () {
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                var failureCallback = createCallback(CallbackType.Failure, 2, callbackRecords);
+                var dataToResolve = {};
+                var promise = index_1.PromiseMock.resolve(dataToResolve);
+                promise.then(successCallback, failureCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: dataToResolve
+                    }
+                ]);
+            });
+            it('subscribing with success should call the success callback', function () {
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                var dataToResolve = {};
+                var promise = index_1.PromiseMock.resolve(dataToResolve);
+                promise.success(successCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: dataToResolve
+                    }
+                ]);
+            });
+            it('subscribing with catch should not call the failure callback', function () {
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var dataToResolve = {};
+                var promise = index_1.PromiseMock.resolve(dataToResolve);
+                promise.catch(failureCallback);
+                chai_1.expect(callbackRecords).to.be.eql([]);
+            });
+            it('subscribing with finally should call the callback', function () {
+                var numberOfTimesCalled = 0;
+                var finallyCallback = function () { return numberOfTimesCalled++; };
+                var dataToResolve = {};
+                var promise = index_1.PromiseMock.resolve(dataToResolve);
+                promise.finally(finallyCallback);
+                chai_1.expect(numberOfTimesCalled).to.be.eql(1);
+            });
+        });
+        describe('static reject', function () {
+            it('the returned promise state should be rejected', function () {
+                var promise = index_1.PromiseMock.reject();
+                chai_1.expect(promise.state).to.equal(index_1.PromiseState.Rejected);
+            });
+            it('isFulfilled should be false', function () {
+                var promise = index_1.PromiseMock.reject();
+                chai_1.expect(promise.isFulfilled()).to.equal(false);
+            });
+            it('isRejected should be true', function () {
+                var promise = index_1.PromiseMock.reject();
+                chai_1.expect(promise.isRejected()).to.equal(true);
+            });
+            it('isPending should be false', function () {
+                var promise = index_1.PromiseMock.reject();
+                chai_1.expect(promise.isPending()).to.equal(false);
+            });
+            it('call resolve should fail', function () {
+                var promise = index_1.PromiseMock.reject();
+                chai_1.expect(function () { return promise.resolve(); }).to.throw(Error);
+            });
+            it('call reject should fail', function () {
+                var promise = index_1.PromiseMock.reject();
+                chai_1.expect(function () { return promise.reject(); }).to.throw(Error);
+            });
+            it('subscribing with then should call the failure callback', function () {
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                var failureCallback = createCallback(CallbackType.Failure, 2, callbackRecords);
+                var error = {};
+                var promise = index_1.PromiseMock.reject(error);
+                promise.then(successCallback, failureCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 2,
+                        data: error
+                    }
+                ]);
+            });
+            it('subscribing with success should not call the success callback', function () {
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                var error = {};
+                var promise = index_1.PromiseMock.reject(error);
+                promise.success(successCallback);
+                chai_1.expect(callbackRecords).to.be.eql([]);
+            });
+            it('subscribing with catch should call the failure callback', function () {
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var error = {};
+                var promise = index_1.PromiseMock.reject(error);
+                promise.catch(failureCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 1,
+                        data: error
+                    }
+                ]);
+            });
+            it('subscribing with finally should call the callback', function () {
+                var numberOfTimesCalled = 0;
+                var finallyCallback = function () { return numberOfTimesCalled++; };
+                var error = {};
+                var promise = index_1.PromiseMock.reject(error);
+                promise.finally(finallyCallback);
+                chai_1.expect(numberOfTimesCalled).to.be.eql(1);
+            });
+        });
     });
 })(Tests || (Tests = {}));
