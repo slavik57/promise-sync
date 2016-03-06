@@ -23,14 +23,14 @@ So I decided to write a new one.
 Well, it was developed by me using TDD and checking the behaviour of a real promise.
 
 ## Features
-- Support callback subscription: success(), catch(), then(), finally()
+- Support callback subscription: ```success()```, ```catch()```, ```then()```, ```finally()```
 - Chaining callback subscriptions
-- Support state checking: state, isPending(), isRejected(), isFulfilled()
-- Support resolving and rejecting: resolve(data?), reject(reason?)
+- Support state checking: ```state```, ```isPending()```, ```isRejected()```, ```isFulfilled()```
+- Support resolving and rejecting: ```resolve(data?)```, ```reject(reason?)```
 - Make it possible to ignore assertion errors inside the success/failure/finally callbacks.
 - Create a resolved/rejected promise with one simple line.
-- Wait for all promises to resolve using PromiseMock.all() method.
-- Wait for one of the promises to resolve using PromiseMock.race() method.
+- Wait for all promises to resolve using ```PromiseMock.all()``` method.
+- Wait for one of the promises to resolve using ```PromiseMock.race()``` method.
 - Written in Typescript so its type-safe
 - Resolving or rejecting not pending promise will throw error
 - Subscribing to resolved promise will raise proper callbacks
@@ -117,7 +117,7 @@ var waitForFirst =
 
 ## Be aware!
 The methods: 'then/success/catch/finally' catch exceptions thrown in the callbacks.
-So if you want to do assertions inside of them you need to tell the PromiseMock to ignore assertion error exceptions,
+So if you want to do assertions inside of them you need to tell the ```PromiseMock``` to ignore assertion error exceptions,
 otherwise the tests will pass even though the assertions are failing
 
 If you are using chai for example:
