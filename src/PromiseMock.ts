@@ -39,6 +39,26 @@ export class PromiseMock<T> {
     return result;
   }
 
+  public static all(iterable: any[]): PromiseMock<any[]> {
+    var result = new PromiseMock<any[]>();
+
+    if (iterable.length === 0) {
+      result.resolve([]);
+      return result;
+    }
+
+    var allPromises: PromiseMock<any>[] = iterable.map(this._castOrCreateResolvedToPromise)
+
+    allPromises.forEach((_promise: PromiseMock<any>) => {
+      _promise.then(
+        _data => this._onOneOfAllPromisesResolved(result, allPromises),
+        _error => this._onOneOfAllPromosesRejected(result, _error)
+      );
+    });
+
+    return result;
+  }
+
   public resolve(data?: T): void {
     if (!this.isPending()) {
       throw new Error('Cannot resolve not pending promise');
@@ -136,6 +156,35 @@ export class PromiseMock<T> {
 
   public isRejected(): boolean {
     return this.state === PromiseState.Rejected;
+  }
+
+  private static _castOrCreateResolvedToPromise(obj: any): PromiseMock<any> {
+    if (obj instanceof PromiseMock) {
+      return obj;
+    } else {
+      return PromiseMock.resolve(obj);
+    }
+  }
+
+  private static _onOneOfAllPromisesResolved(promiseForAll: PromiseMock<any[]>, allPromises: PromiseMock<any>[]): void {
+    var isAllResolved: boolean =
+      allPromises.reduce(
+        (_prev: boolean, _current: PromiseMock<any>) => _prev && _current.isFulfilled(),
+        true);
+
+    if (!isAllResolved) {
+      return;
+    }
+
+    var results: any[] = allPromises.map(_promise => _promise._resolvedData);
+
+    promiseForAll.resolve(results);
+  }
+
+  private static _onOneOfAllPromosesRejected(promiseForAll: PromiseMock<any[]>, error: any): void {
+    if (promiseForAll.isPending()) {
+      promiseForAll.reject(error);
+    }
   }
 
   private _resolveCallbacks(data: T): void {

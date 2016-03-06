@@ -26,6 +26,19 @@ var PromiseMock = (function () {
         result.reject(error);
         return result;
     };
+    PromiseMock.all = function (iterable) {
+        var _this = this;
+        var result = new PromiseMock();
+        if (iterable.length === 0) {
+            result.resolve([]);
+            return result;
+        }
+        var allPromises = iterable.map(this._castOrCreateResolvedToPromise);
+        allPromises.forEach(function (_promise) {
+            _promise.then(function (_data) { return _this._onOneOfAllPromisesResolved(result, allPromises); }, function (_error) { return _this._onOneOfAllPromosesRejected(result, _error); });
+        });
+        return result;
+    };
     PromiseMock.prototype.resolve = function (data) {
         if (!this.isPending()) {
             throw new Error('Cannot resolve not pending promise');
@@ -98,6 +111,27 @@ var PromiseMock = (function () {
     };
     PromiseMock.prototype.isRejected = function () {
         return this.state === PromiseState_1.PromiseState.Rejected;
+    };
+    PromiseMock._castOrCreateResolvedToPromise = function (obj) {
+        if (obj instanceof PromiseMock) {
+            return obj;
+        }
+        else {
+            return PromiseMock.resolve(obj);
+        }
+    };
+    PromiseMock._onOneOfAllPromisesResolved = function (promiseForAll, allPromises) {
+        var isAllResolved = allPromises.reduce(function (_prev, _current) { return _prev && _current.isFulfilled(); }, true);
+        if (!isAllResolved) {
+            return;
+        }
+        var results = allPromises.map(function (_promise) { return _promise._resolvedData; });
+        promiseForAll.resolve(results);
+    };
+    PromiseMock._onOneOfAllPromosesRejected = function (promiseForAll, error) {
+        if (promiseForAll.isPending()) {
+            promiseForAll.reject(error);
+        }
     };
     PromiseMock.prototype._resolveCallbacks = function (data) {
         var _this = this;
