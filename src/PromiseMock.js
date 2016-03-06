@@ -35,7 +35,20 @@ var PromiseMock = (function () {
         }
         var allPromises = iterable.map(this._castOrCreateResolvedToPromise);
         allPromises.forEach(function (_promise) {
-            _promise.then(function (_data) { return _this._onOneOfAllPromisesResolved(result, allPromises); }, function (_error) { return _this._onOneOfAllPromosesRejected(result, _error); });
+            _promise.then(function (_data) { return _this._resolveIfAllResolvedWithDataOfAll(result, allPromises); }, function (_error) { return _this._rejectIfPending(result, _error); });
+        });
+        return result;
+    };
+    PromiseMock.race = function (iterable) {
+        var _this = this;
+        var result = new PromiseMock();
+        if (iterable.length === 0) {
+            result.resolve();
+            return result;
+        }
+        var allPromises = iterable.map(this._castOrCreateResolvedToPromise);
+        allPromises.forEach(function (_promise) {
+            _promise.then(function (_data) { return _this._resolveIfPending(result, _data); }, function (_error) { return _this._rejectIfPending(result, _error); });
         });
         return result;
     };
@@ -120,17 +133,22 @@ var PromiseMock = (function () {
             return PromiseMock.resolve(obj);
         }
     };
-    PromiseMock._onOneOfAllPromisesResolved = function (promiseForAll, allPromises) {
-        var isAllResolved = allPromises.reduce(function (_prev, _current) { return _prev && _current.isFulfilled(); }, true);
-        if (!isAllResolved) {
+    PromiseMock._resolveIfAllResolvedWithDataOfAll = function (promise, dataSourcePromises) {
+        var isAllFulfilled = dataSourcePromises.reduce(function (_prev, _current) { return _prev && _current.isFulfilled(); }, true);
+        if (!isAllFulfilled) {
             return;
         }
-        var results = allPromises.map(function (_promise) { return _promise._resolvedData; });
-        promiseForAll.resolve(results);
+        var results = dataSourcePromises.map(function (_promise) { return _promise._resolvedData; });
+        promise.resolve(results);
     };
-    PromiseMock._onOneOfAllPromosesRejected = function (promiseForAll, error) {
-        if (promiseForAll.isPending()) {
-            promiseForAll.reject(error);
+    PromiseMock._resolveIfPending = function (promise, data) {
+        if (promise.isPending()) {
+            promise.resolve(data);
+        }
+    };
+    PromiseMock._rejectIfPending = function (promise, error) {
+        if (promise.isPending()) {
+            promise.reject(error);
         }
     };
     PromiseMock.prototype._resolveCallbacks = function (data) {

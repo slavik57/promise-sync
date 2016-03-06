@@ -2022,5 +2022,210 @@ var Tests;
                 ]);
             });
         });
+        describe('race', function () {
+            it('if passed unresolved promises, should return a promise in pending state', function () {
+                var promise = index_1.PromiseMock.race([new index_1.PromiseMock()]);
+                chai_1.expect(promise.state).to.be.eq(index_1.PromiseState.Pending);
+            });
+            it('if only one of the promises is resolved, should resolve', function () {
+                var promiseToResolve = new index_1.PromiseMock();
+                var pendingPromise = new index_1.PromiseMock();
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                var dataToResolve = {};
+                index_1.PromiseMock.race([promiseToResolve, pendingPromise]).success(successCallback);
+                promiseToResolve.resolve(dataToResolve);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: dataToResolve
+                    }
+                ]);
+            });
+            it('if one of the promises rejects, should reject correctly', function () {
+                var pendingPromise1 = new index_1.PromiseMock();
+                var pendingPromise2 = new index_1.PromiseMock();
+                var promiseToReject = new index_1.PromiseMock();
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var error = {};
+                index_1.PromiseMock.race([pendingPromise1, promiseToReject, pendingPromise2]).catch(failureCallback);
+                promiseToReject.reject(error);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 1,
+                        data: error
+                    }
+                ]);
+            });
+            it('if all the promises reject, should reject correctly', function () {
+                var promiseToReject1 = new index_1.PromiseMock();
+                var promiseToReject2 = new index_1.PromiseMock();
+                var promiseToReject3 = new index_1.PromiseMock();
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var error1 = {};
+                var error2 = {};
+                var error3 = {};
+                index_1.PromiseMock.race([promiseToReject1, promiseToReject3, promiseToReject2]).catch(failureCallback);
+                promiseToReject2.reject(error2);
+                promiseToReject1.reject(error1);
+                promiseToReject3.reject(error3);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 1,
+                        data: error2
+                    }
+                ]);
+            });
+            it('if all of the promises resolve, should resolve correctly', function () {
+                var promiseToResolve1 = new index_1.PromiseMock();
+                var promiseToResolve2 = new index_1.PromiseMock();
+                var promiseToResolve3 = new index_1.PromiseMock();
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                var dataToResolve1 = {};
+                var dataToResolve2 = {};
+                var dataToResolve3 = {};
+                index_1.PromiseMock.race([promiseToResolve1, promiseToResolve2, promiseToResolve3]).success(successCallback);
+                promiseToResolve1.resolve(dataToResolve1);
+                promiseToResolve2.resolve(dataToResolve2);
+                promiseToResolve3.resolve(dataToResolve3);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: dataToResolve1
+                    }
+                ]);
+            });
+            it('if all of the promises were resolved before calling the method, should resolve correctly', function () {
+                var promiseToResolve1 = new index_1.PromiseMock();
+                var promiseToResolve2 = new index_1.PromiseMock();
+                var promiseToResolve3 = new index_1.PromiseMock();
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                var dataToResolve1 = {};
+                var dataToResolve2 = {};
+                var dataToResolve3 = {};
+                promiseToResolve1.resolve(dataToResolve1);
+                promiseToResolve2.resolve(dataToResolve2);
+                promiseToResolve3.resolve(dataToResolve3);
+                index_1.PromiseMock.race([promiseToResolve1, promiseToResolve2, promiseToResolve3]).success(successCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: dataToResolve1
+                    }
+                ]);
+            });
+            it('if one of the promises was rejected before calling the method, should reject', function () {
+                var pendingPromise1 = new index_1.PromiseMock();
+                var pendingPromise2 = new index_1.PromiseMock();
+                var promiseToReject = new index_1.PromiseMock();
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var error = {};
+                promiseToReject.reject(error);
+                index_1.PromiseMock.race([pendingPromise1, promiseToReject, pendingPromise2]).catch(failureCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 1,
+                        data: error
+                    }
+                ]);
+            });
+            it('if all the promises were rejected before calling the method, should reject', function () {
+                var promiseToReject1 = new index_1.PromiseMock();
+                var promiseToReject2 = new index_1.PromiseMock();
+                var promiseToReject3 = new index_1.PromiseMock();
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var error1 = {};
+                var error2 = {};
+                var error3 = {};
+                promiseToReject1.reject(error1);
+                promiseToReject2.reject(error2);
+                promiseToReject3.reject(error3);
+                index_1.PromiseMock.race([promiseToReject1, promiseToReject3, promiseToReject2]).catch(failureCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 1,
+                        data: error1
+                    }
+                ]);
+            });
+            it('if one of the passed objects is not a promise, should return its value on success', function () {
+                var pendeingPromise1 = new index_1.PromiseMock();
+                var pendingPromise2 = new index_1.PromiseMock();
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                var dataToResolve1 = {};
+                var dataToResolve2 = {};
+                var otherData = {};
+                index_1.PromiseMock.race([pendeingPromise1, otherData, pendingPromise2]).success(successCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: otherData
+                    }
+                ]);
+            });
+            it('if all of the passed objects are not promises, should resolve and return the first value on success', function () {
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                var data1 = {};
+                var data2 = {};
+                var data3 = {};
+                index_1.PromiseMock.race([data1, data2, data3]).success(successCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: data1
+                    }
+                ]);
+            });
+            it('if one of the passed objects is null or undefined, should resolve and return the first value on success', function () {
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                var data1 = undefined;
+                var data2 = null;
+                var data3 = {};
+                index_1.PromiseMock.race([data1, data2, data3]).success(successCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: data1
+                    }
+                ]);
+            });
+            it('if the passed promises array is null or undefined, should throw error', function () {
+                var actionNull = function () { return index_1.PromiseMock.race(null); };
+                var actionUndefined = function () { return index_1.PromiseMock.race(undefined); };
+                chai_1.expect(actionNull).to.throw(Error);
+                chai_1.expect(actionUndefined).to.throw(Error);
+            });
+            it('if empty array is passed, should resolve coorectly', function () {
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                index_1.PromiseMock.race([]).success(successCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: undefined
+                    }
+                ]);
+            });
+        });
     });
 })(Tests || (Tests = {}));

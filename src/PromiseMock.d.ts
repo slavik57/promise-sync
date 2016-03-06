@@ -13,6 +13,7 @@ export declare class PromiseMock<T> {
     static resolve<T>(data?: T): PromiseMock<T>;
     static reject<T>(error?: any): PromiseMock<T>;
     static all(iterable: any[]): PromiseMock<any[]>;
+    static race(iterable: any[]): PromiseMock<any>;
     resolve(data?: T): void;
     reject(reason?: any): void;
     success<U>(successCallback: ISuccessCallback<T, U>): PromiseMock<U>;
@@ -23,8 +24,9 @@ export declare class PromiseMock<T> {
     isFulfilled(): boolean;
     isRejected(): boolean;
     private static _castOrCreateResolvedToPromise(obj);
-    private static _onOneOfAllPromisesResolved(promiseForAll, allPromises);
-    private static _onOneOfAllPromosesRejected(promiseForAll, error);
+    private static _resolveIfAllResolvedWithDataOfAll(promise, dataSourcePromises);
+    private static _resolveIfPending(promise, data);
+    private static _rejectIfPending(promise, error);
     private _resolveCallbacks(data);
     private _resolveCallback(callback, data);
     private _rejectCallbacks(error);

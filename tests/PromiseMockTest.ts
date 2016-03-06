@@ -3085,5 +3085,299 @@ module Tests {
         ]);
       });
     });
+
+    describe('race', () => {
+      it('if passed unresolved promises, should return a promise in pending state', () => {
+        // Act
+        var promise: PromiseMock<any[]> = PromiseMock.race([new PromiseMock<any>()]);
+
+        // Assert
+        expect(promise.state).to.be.eq(PromiseState.Pending);
+      });
+
+      it('if only one of the promises is resolved, should resolve', () => {
+        // Arrange
+        var promiseToResolve = new PromiseMock<any>();
+        var pendingPromise = new PromiseMock<any>();
+
+        var callbackRecords: ICallbackRecord[] = [];
+        var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+
+        var dataToResolve = {};
+
+        // Act
+        PromiseMock.race([promiseToResolve, pendingPromise]).success(successCallback);
+        promiseToResolve.resolve(dataToResolve);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Success,
+            callbackNumber: 1,
+            data: dataToResolve
+          }
+        ]);
+      });
+
+      it('if one of the promises rejects, should reject correctly', () => {
+        // Arrange
+        var pendingPromise1 = new PromiseMock<any>();
+        var pendingPromise2 = new PromiseMock<any>();
+        var promiseToReject = new PromiseMock<any>();
+
+        var callbackRecords: ICallbackRecord[] = [];
+        var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+
+        var error = {};
+
+        // Act
+        PromiseMock.race([pendingPromise1, promiseToReject, pendingPromise2]).catch(failureCallback);
+        promiseToReject.reject(error);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Failure,
+            callbackNumber: 1,
+            data: error
+          }
+        ]);
+      });
+
+      it('if all the promises reject, should reject correctly', () => {
+        // Arrange
+        var promiseToReject1 = new PromiseMock<any>();
+        var promiseToReject2 = new PromiseMock<any>();
+        var promiseToReject3 = new PromiseMock<any>();
+
+        var callbackRecords: ICallbackRecord[] = [];
+        var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+
+        var error1 = {};
+        var error2 = {};
+        var error3 = {};
+
+        // Act
+        PromiseMock.race([promiseToReject1, promiseToReject3, promiseToReject2]).catch(failureCallback);
+        promiseToReject2.reject(error2);
+        promiseToReject1.reject(error1);
+        promiseToReject3.reject(error3);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Failure,
+            callbackNumber: 1,
+            data: error2
+          }
+        ]);
+      });
+
+      it('if all of the promises resolve, should resolve correctly', () => {
+        // Arrange
+        var promiseToResolve1 = new PromiseMock<any>();
+        var promiseToResolve2 = new PromiseMock<any>();
+        var promiseToResolve3 = new PromiseMock<any>();
+
+        var callbackRecords: ICallbackRecord[] = [];
+        var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+
+        var dataToResolve1 = {};
+        var dataToResolve2 = {};
+        var dataToResolve3 = {};
+
+        // Act
+        PromiseMock.race([promiseToResolve1, promiseToResolve2, promiseToResolve3]).success(successCallback);
+        promiseToResolve1.resolve(dataToResolve1);
+        promiseToResolve2.resolve(dataToResolve2);
+        promiseToResolve3.resolve(dataToResolve3);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Success,
+            callbackNumber: 1,
+            data: dataToResolve1
+          }
+        ]);
+      });
+
+      it('if all of the promises were resolved before calling the method, should resolve correctly', () => {
+        // Arrange
+        var promiseToResolve1 = new PromiseMock<any>();
+        var promiseToResolve2 = new PromiseMock<any>();
+        var promiseToResolve3 = new PromiseMock<any>();
+
+        var callbackRecords: ICallbackRecord[] = [];
+        var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+
+        var dataToResolve1 = {};
+        var dataToResolve2 = {};
+        var dataToResolve3 = {};
+
+        // Act
+        promiseToResolve1.resolve(dataToResolve1);
+        promiseToResolve2.resolve(dataToResolve2);
+        promiseToResolve3.resolve(dataToResolve3);
+        PromiseMock.race([promiseToResolve1, promiseToResolve2, promiseToResolve3]).success(successCallback);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Success,
+            callbackNumber: 1,
+            data: dataToResolve1
+          }
+        ]);
+      });
+
+      it('if one of the promises was rejected before calling the method, should reject', () => {
+        // Arrange
+        var pendingPromise1 = new PromiseMock<any>();
+        var pendingPromise2 = new PromiseMock<any>();
+        var promiseToReject = new PromiseMock<any>();
+
+        var callbackRecords: ICallbackRecord[] = [];
+        var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+
+        var error = {};
+
+        // Act
+        promiseToReject.reject(error);
+        PromiseMock.race([pendingPromise1, promiseToReject, pendingPromise2]).catch(failureCallback);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Failure,
+            callbackNumber: 1,
+            data: error
+          }
+        ]);
+      });
+
+      it('if all the promises were rejected before calling the method, should reject', () => {
+        // Arrange
+        var promiseToReject1 = new PromiseMock<any>();
+        var promiseToReject2 = new PromiseMock<any>();
+        var promiseToReject3 = new PromiseMock<any>();
+
+        var callbackRecords: ICallbackRecord[] = [];
+        var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+
+        var error1 = {};
+        var error2 = {};
+        var error3 = {};
+
+        // Act
+        promiseToReject1.reject(error1);
+        promiseToReject2.reject(error2);
+        promiseToReject3.reject(error3);
+        PromiseMock.race([promiseToReject1, promiseToReject3, promiseToReject2]).catch(failureCallback);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Failure,
+            callbackNumber: 1,
+            data: error1
+          }
+        ]);
+      });
+
+      it('if one of the passed objects is not a promise, should return its value on success', () => {
+        // Arrange
+        var pendeingPromise1 = new PromiseMock<any>();
+        var pendingPromise2 = new PromiseMock<any>();
+
+        var callbackRecords: ICallbackRecord[] = [];
+        var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+
+        var dataToResolve1 = {};
+        var dataToResolve2 = {};
+        var otherData = {};
+
+        // Act
+        PromiseMock.race([pendeingPromise1, otherData, pendingPromise2]).success(successCallback);
+
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Success,
+            callbackNumber: 1,
+            data: otherData
+          }
+        ]);
+      });
+
+      it('if all of the passed objects are not promises, should resolve and return the first value on success', () => {
+        // Arrange
+        var callbackRecords: ICallbackRecord[] = [];
+        var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+
+        var data1 = {};
+        var data2 = {};
+        var data3 = {};
+
+        // Act
+        PromiseMock.race([data1, data2, data3]).success(successCallback);
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Success,
+            callbackNumber: 1,
+            data: data1
+          }
+        ]);
+      });
+
+      it('if one of the passed objects is null or undefined, should resolve and return the first value on success', () => {
+        // Arrange
+        var callbackRecords: ICallbackRecord[] = [];
+        var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+
+        var data1 = undefined;
+        var data2 = null;
+        var data3 = {};
+
+        // Act
+        PromiseMock.race([data1, data2, data3]).success(successCallback);
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Success,
+            callbackNumber: 1,
+            data: data1
+          }
+        ]);
+      });
+
+      it('if the passed promises array is null or undefined, should throw error', () => {
+        // Act
+        var actionNull = () => PromiseMock.race(null);
+        var actionUndefined = () => PromiseMock.race(undefined);
+
+        // Asserts
+        expect(actionNull).to.throw(Error)
+        expect(actionUndefined).to.throw(Error)
+      });
+
+      it('if empty array is passed, should resolve coorectly', () => {
+        // Arrange
+        var callbackRecords: ICallbackRecord[] = [];
+        var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+
+        // Act
+        PromiseMock.race([]).success(successCallback);
+        // Assert
+        expect(callbackRecords).to.be.eql([
+          {
+            type: CallbackType.Success,
+            callbackNumber: 1,
+            data: undefined
+          }
+        ]);
+      });
+    });
   });
 }
