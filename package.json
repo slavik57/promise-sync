@@ -11,7 +11,12 @@
     "url": "git+https://github.com/slavik57/promise-sync.git"
   },
   "keywords": [
-    "promise"
+    "promise",
+    "promise-sync",
+    "synchronous",
+    "sync",
+    "sync-promise",
+    "sync promise"
   ],
   "author": "Slava Shpitalny <slavik57@gmail.com>",
   "license": "ISC",
