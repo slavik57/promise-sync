@@ -237,7 +237,10 @@ export class PromiseMock<T> {
 
     if (result instanceof PromiseMock) {
       var promiseResult = <PromiseMock<any>>result;
-      promiseResult.finally(() => callback.nextPromise.resolve(data));
+      promiseResult.then(
+        _data => callback.nextPromise.resolve(_data),
+        _error => callback.nextPromise.reject(_error)
+      );
     } else {
       callback.nextPromise.resolve(result);
     }
@@ -267,7 +270,10 @@ export class PromiseMock<T> {
 
     if (result instanceof PromiseMock) {
       var promiseResult = <PromiseMock<any>>result;
-      promiseResult.finally(() => callback.nextPromise.reject(error));
+      promiseResult.then(
+        _data => callback.nextPromise.resolve(_data),
+        _error => callback.nextPromise.reject(_error)
+      );
     } else {
       callback.nextPromise.resolve(result);
     }

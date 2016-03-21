@@ -174,7 +174,7 @@ var PromiseMock = (function () {
         }
         if (result instanceof PromiseMock) {
             var promiseResult = result;
-            promiseResult.finally(function () { return callback.nextPromise.resolve(data); });
+            promiseResult.then(function (_data) { return callback.nextPromise.resolve(_data); }, function (_error) { return callback.nextPromise.reject(_error); });
         }
         else {
             callback.nextPromise.resolve(result);
@@ -203,7 +203,7 @@ var PromiseMock = (function () {
         }
         if (result instanceof PromiseMock) {
             var promiseResult = result;
-            promiseResult.finally(function () { return callback.nextPromise.reject(error); });
+            promiseResult.then(function (_data) { return callback.nextPromise.resolve(_data); }, function (_error) { return callback.nextPromise.reject(_error); });
         }
         else {
             callback.nextPromise.resolve(result);
