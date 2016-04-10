@@ -41,4 +41,6 @@ export declare class PromiseMock<T> {
     private _clearCallbacks();
     private _isNullOrUndefined(obj);
     private _throwIfAssertionExceptionType(error);
+    private _isHasThenMethod(result);
+    private _isHasFinallyMethod(result);
 }

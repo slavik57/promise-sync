@@ -172,9 +172,8 @@ var PromiseMock = (function () {
             callback.nextPromise.reject(e);
             return;
         }
-        if (result instanceof PromiseMock) {
-            var promiseResult = result;
-            promiseResult.then(function (_data) { return callback.nextPromise.resolve(_data); }, function (_error) { return callback.nextPromise.reject(_error); });
+        if (this._isHasThenMethod(result)) {
+            result.then(function (_data) { return callback.nextPromise.resolve(_data); }, function (_error) { return callback.nextPromise.reject(_error); });
         }
         else {
             callback.nextPromise.resolve(result);
@@ -201,9 +200,8 @@ var PromiseMock = (function () {
             callback.nextPromise.reject(e);
             return;
         }
-        if (result instanceof PromiseMock) {
-            var promiseResult = result;
-            promiseResult.then(function (_data) { return callback.nextPromise.resolve(_data); }, function (_error) { return callback.nextPromise.reject(_error); });
+        if (this._isHasThenMethod(result)) {
+            result.then(function (_data) { return callback.nextPromise.resolve(_data); }, function (_error) { return callback.nextPromise.reject(_error); });
         }
         else {
             callback.nextPromise.resolve(result);
@@ -230,9 +228,8 @@ var PromiseMock = (function () {
     };
     PromiseMock.prototype._callFinallyCallbackAndThenPerformAction = function (callback, action) {
         var result = this._callFinallyCallback(callback);
-        if (result instanceof PromiseMock) {
-            var promiseResult = result;
-            promiseResult.finally(action);
+        if (this._isHasFinallyMethod(result)) {
+            result.finally(action);
         }
         else {
             action();
@@ -283,6 +280,12 @@ var PromiseMock = (function () {
                 throw error;
             }
         });
+    };
+    PromiseMock.prototype._isHasThenMethod = function (result) {
+        return !!result && !!result.then;
+    };
+    PromiseMock.prototype._isHasFinallyMethod = function (result) {
+        return !!result && !!result.finally;
     };
     PromiseMock._assertionExceptionTypes = [];
     return PromiseMock;

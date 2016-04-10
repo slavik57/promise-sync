@@ -37,6 +37,16 @@ var Tests;
                 }
             };
         }
+        function wrapPromiseWithObjectWithThenMethod(promiseMock) {
+            return {
+                then: function (successCallback, failureCallback) { return promiseMock.then(successCallback, failureCallback); }
+            };
+        }
+        function wrapPromiseWithObjectWithFinallyMethod(promiseMock) {
+            return {
+                finally: function (callback) { return promiseMock.finally(callback); }
+            };
+        }
         beforeEach(function () {
             promiseMock = new index_1.PromiseMock();
         });
@@ -346,6 +356,48 @@ var Tests;
                         data: data4
                     }]);
             });
+            it('register to success on the returned promise, resolve with data, promises return object with then, should call the next callbacks with correct data', function () {
+                var data1 = 11;
+                var data2 = 12;
+                var data3 = 13;
+                var data4 = 14;
+                var returnedPromise1 = new index_1.PromiseMock();
+                var returnedPromise2 = new index_1.PromiseMock();
+                var returnedPromise3 = new index_1.PromiseMock();
+                var objectWithThen1 = wrapPromiseWithObjectWithThenMethod(returnedPromise1);
+                var objectWithThen2 = wrapPromiseWithObjectWithThenMethod(returnedPromise2);
+                var objectWithThen3 = wrapPromiseWithObjectWithThenMethod(returnedPromise3);
+                var callbackRecords = [];
+                promiseMock.success(createCallback(CallbackType.Success, 1, callbackRecords, objectWithThen1))
+                    .success(createCallback(CallbackType.Success, 2, callbackRecords, objectWithThen2))
+                    .success(createCallback(CallbackType.Success, 3, callbackRecords, objectWithThen3))
+                    .success(createCallback(CallbackType.Success, 4, callbackRecords));
+                promiseMock.resolve(data1);
+                returnedPromise1.resolve(data2);
+                returnedPromise2.resolve(data3);
+                returnedPromise3.resolve(data4);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: data1
+                    },
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 2,
+                        data: data2
+                    },
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 3,
+                        data: data3
+                    },
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 4,
+                        data: data4
+                    }]);
+            });
             it('register to catch on the returned promise, resolve with data, success callback throws error, should call the next catch callback', function () {
                 var data = 'data';
                 var error = 'error';
@@ -374,6 +426,43 @@ var Tests;
                 var returnedPromise = new index_1.PromiseMock();
                 var callbackRecords = [];
                 promiseMock.success(createCallback(CallbackType.Success, 1, callbackRecords, returnedPromise))
+                    .catch(createThrowsCallback(CallbackType.Failure, 2, callbackRecords, error2))
+                    .catch(createThrowsCallback(CallbackType.Failure, 3, callbackRecords, error3))
+                    .catch(createCallback(CallbackType.Failure, 4, callbackRecords));
+                promiseMock.resolve(data1);
+                returnedPromise.reject(error1);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: data1
+                    },
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 2,
+                        data: error1
+                    },
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 3,
+                        data: error2
+                    },
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 4,
+                        data: error3
+                    }
+                ]);
+            });
+            it('register to catch on the returned promise, resolve with data, promises return objects with then that reject, catch callbacks throw erors, should call the next callbacks', function () {
+                var data1 = 11;
+                var error1 = 12;
+                var error2 = 13;
+                var error3 = 14;
+                var returnedPromise = new index_1.PromiseMock();
+                var objectWithThen = wrapPromiseWithObjectWithThenMethod(returnedPromise);
+                var callbackRecords = [];
+                promiseMock.success(createCallback(CallbackType.Success, 1, callbackRecords, objectWithThen))
                     .catch(createThrowsCallback(CallbackType.Failure, 2, callbackRecords, error2))
                     .catch(createThrowsCallback(CallbackType.Failure, 3, callbackRecords, error3))
                     .catch(createCallback(CallbackType.Failure, 4, callbackRecords));
@@ -848,6 +937,48 @@ var Tests;
                         data: data4
                     }]);
             });
+            it('register to success on the returned promise, resolve with data, promises return objects with then, should call the next success callbacks with correct data', function () {
+                var data1 = 11;
+                var data2 = 12;
+                var data3 = 13;
+                var data4 = 14;
+                var returnedPromise1 = new index_1.PromiseMock();
+                var returnedPromise2 = new index_1.PromiseMock();
+                var returnedPromise3 = new index_1.PromiseMock();
+                var objectWithThen1 = wrapPromiseWithObjectWithThenMethod(returnedPromise1);
+                var objectWithThen2 = wrapPromiseWithObjectWithThenMethod(returnedPromise2);
+                var objectWithThen3 = wrapPromiseWithObjectWithThenMethod(returnedPromise3);
+                var callbackRecords = [];
+                promiseMock.then(createCallback(CallbackType.Success, 1, callbackRecords, objectWithThen1))
+                    .then(createCallback(CallbackType.Success, 2, callbackRecords, objectWithThen2))
+                    .then(createCallback(CallbackType.Success, 3, callbackRecords, objectWithThen3))
+                    .then(createCallback(CallbackType.Success, 4, callbackRecords));
+                promiseMock.resolve(data1);
+                returnedPromise1.resolve(data2);
+                returnedPromise2.resolve(data3);
+                returnedPromise3.resolve(data4);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: data1
+                    },
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 2,
+                        data: data2
+                    },
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 3,
+                        data: data3
+                    },
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 4,
+                        data: data4
+                    }]);
+            });
             it('register to catch on the returned promise, resolve with data, success callback throws error, should call the next catch callback', function () {
                 var data = 'data';
                 var error = 'error';
@@ -896,6 +1027,43 @@ var Tests;
                 var returnedPromise = new index_1.PromiseMock();
                 var callbackRecords = [];
                 promiseMock.then(createCallback(CallbackType.Success, 1, callbackRecords, returnedPromise))
+                    .then(function () { }, createThrowsCallback(CallbackType.Failure, 2, callbackRecords, error2))
+                    .catch(createThrowsCallback(CallbackType.Failure, 3, callbackRecords, error3))
+                    .catch(createCallback(CallbackType.Failure, 4, callbackRecords));
+                promiseMock.resolve(data1);
+                returnedPromise.reject(error1);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 1,
+                        data: data1
+                    },
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 2,
+                        data: error1
+                    },
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 3,
+                        data: error2
+                    },
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 4,
+                        data: error3
+                    }
+                ]);
+            });
+            it('register to catch on the returned promise, resolve with data, promises return object with then that reject, catch callbacks throw erors, should call the next callbacks', function () {
+                var data1 = 11;
+                var error1 = 12;
+                var error2 = 13;
+                var error3 = 14;
+                var returnedPromise = new index_1.PromiseMock();
+                var objectWithThen = wrapPromiseWithObjectWithThenMethod(returnedPromise);
+                var callbackRecords = [];
+                promiseMock.then(createCallback(CallbackType.Success, 1, callbackRecords, objectWithThen))
                     .then(function () { }, createThrowsCallback(CallbackType.Failure, 2, callbackRecords, error2))
                     .catch(createThrowsCallback(CallbackType.Failure, 3, callbackRecords, error3))
                     .catch(createCallback(CallbackType.Failure, 4, callbackRecords));
@@ -1375,9 +1543,43 @@ var Tests;
                 finallyReturnedPromiseMock.resolve();
                 chai_1.expect(numberOfTimesCalled).to.be.equal(1);
             });
+            it('register finally, return object with finally from callback, register success after finally, the success will be called after the returned promise is resolved', function () {
+                var finallyReturnedPromiseMock = new index_1.PromiseMock();
+                var objectWithFinally = wrapPromiseWithObjectWithFinallyMethod(finallyReturnedPromiseMock);
+                var finallyCallback = function () { return objectWithFinally; };
+                var data = 111;
+                var numberOfTimesCalled = 0;
+                var successCallback = function (_data) {
+                    numberOfTimesCalled++;
+                    chai_1.expect(_data).to.be.equal(data);
+                };
+                promiseMock.finally(finallyCallback)
+                    .success(successCallback);
+                promiseMock.resolve(data);
+                chai_1.expect(numberOfTimesCalled).to.be.equal(0);
+                finallyReturnedPromiseMock.resolve();
+                chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            });
             it('register finally, return promise from callback, register success after finally, the success will be called after the returned promise is rejected', function () {
                 var finallyReturnedPromiseMock = new index_1.PromiseMock();
                 var finallyCallback = function () { return finallyReturnedPromiseMock; };
+                var data = 111;
+                var numberOfTimesCalled = 0;
+                var successCallback = function (_data) {
+                    numberOfTimesCalled++;
+                    chai_1.expect(_data).to.be.equal(data);
+                };
+                promiseMock.finally(finallyCallback)
+                    .success(successCallback);
+                promiseMock.resolve(data);
+                chai_1.expect(numberOfTimesCalled).to.be.equal(0);
+                finallyReturnedPromiseMock.reject();
+                chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            });
+            it('register finally, return object with finally from callback, register success after finally, the success will be called after the returned promise is rejected', function () {
+                var finallyReturnedPromiseMock = new index_1.PromiseMock();
+                var objectWithFinally = wrapPromiseWithObjectWithFinallyMethod(finallyReturnedPromiseMock);
+                var finallyCallback = function () { return objectWithFinally; };
                 var data = 111;
                 var numberOfTimesCalled = 0;
                 var successCallback = function (_data) {
@@ -1407,8 +1609,42 @@ var Tests;
                 finallyReturnedPromiseMock.resolve();
                 chai_1.expect(numberOfTimesCalled).to.be.equal(1);
             });
+            it('register finally, return object with finally from callback, register catch after finally, the catch will be called after the returned promise is resolved', function () {
+                var finallyReturnedPromiseMock = new index_1.PromiseMock();
+                var objectWithFinally = wrapPromiseWithObjectWithFinallyMethod(finallyReturnedPromiseMock);
+                var finallyCallback = function () { return objectWithFinally; };
+                var error = 111;
+                var numberOfTimesCalled = 0;
+                var catchCallback = function (_error) {
+                    numberOfTimesCalled++;
+                    chai_1.expect(_error).to.be.equal(error);
+                };
+                promiseMock.finally(finallyCallback)
+                    .catch(catchCallback);
+                promiseMock.reject(error);
+                chai_1.expect(numberOfTimesCalled).to.be.equal(0);
+                finallyReturnedPromiseMock.resolve();
+                chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            });
             it('register finally, return promise from callback, register catch after finally, the catch will be called after the returned promise is rejected', function () {
                 var finallyReturnedPromiseMock = new index_1.PromiseMock();
+                var finallyCallback = function () { return finallyReturnedPromiseMock; };
+                var error = 111;
+                var numberOfTimesCalled = 0;
+                var catchCallback = function (_error) {
+                    numberOfTimesCalled++;
+                    chai_1.expect(_error).to.be.equal(error);
+                };
+                promiseMock.finally(finallyCallback)
+                    .catch(catchCallback);
+                promiseMock.reject(error);
+                chai_1.expect(numberOfTimesCalled).to.be.equal(0);
+                finallyReturnedPromiseMock.reject();
+                chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            });
+            it('register finally, return object with finally from callback, register catch after finally, the catch will be called after the returned promise is rejected', function () {
+                var finallyReturnedPromiseMock = new index_1.PromiseMock();
+                var objectWithFinally = wrapPromiseWithObjectWithFinallyMethod(finallyReturnedPromiseMock);
                 var finallyCallback = function () { return finallyReturnedPromiseMock; };
                 var error = 111;
                 var numberOfTimesCalled = 0;

@@ -235,9 +235,8 @@ export class PromiseMock<T> {
       return;
     }
 
-    if (result instanceof PromiseMock) {
-      var promiseResult = <PromiseMock<any>>result;
-      promiseResult.then(
+    if (this._isHasThenMethod(result)) {
+      result.then(
         _data => callback.nextPromise.resolve(_data),
         _error => callback.nextPromise.reject(_error)
       );
@@ -268,9 +267,8 @@ export class PromiseMock<T> {
       return;
     }
 
-    if (result instanceof PromiseMock) {
-      var promiseResult = <PromiseMock<any>>result;
-      promiseResult.then(
+    if (this._isHasThenMethod(result)) {
+      result.then(
         _data => callback.nextPromise.resolve(_data),
         _error => callback.nextPromise.reject(_error)
       );
@@ -303,10 +301,8 @@ export class PromiseMock<T> {
   private _callFinallyCallbackAndThenPerformAction(callback: ICallback<T>, action: () => void): void {
     var result: any = this._callFinallyCallback(callback);
 
-    if (result instanceof PromiseMock) {
-      var promiseResult = <PromiseMock<any>>result;
-
-      promiseResult.finally(action);
+    if (this._isHasFinallyMethod(result)) {
+      result.finally(action);
     } else {
       action();
     }
@@ -362,5 +358,13 @@ export class PromiseMock<T> {
         throw error;
       }
     });
+  }
+
+  private _isHasThenMethod(result: any): boolean {
+    return !!result && !!result.then;
+  }
+
+  private _isHasFinallyMethod(result: any): boolean {
+    return !!result && !!result.finally;
   }
 }
