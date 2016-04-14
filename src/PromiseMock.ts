@@ -20,6 +20,7 @@ export class PromiseMock<T> {
     return this._state;
   }
 
+  // TODO: remove the setter when typescript 2.0 is released
   public set state(state: PromiseState) {
     throw 'Cannot set state';
   }
