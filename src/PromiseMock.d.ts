@@ -8,7 +8,7 @@ export declare class PromiseMock<T> {
     private _resolvedData;
     private _rejectedReason;
     constructor();
-    readonly state: PromiseState;
+    state: PromiseState;
     static setAssertionExceptionTypes(assertionExceptionTypes: Function[]): void;
     static resolve<T>(data?: T): PromiseMock<T>;
     static reject<T>(error?: any): PromiseMock<T>;
