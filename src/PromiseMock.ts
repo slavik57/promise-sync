@@ -20,6 +20,10 @@ export class PromiseMock<T> {
     return this._state;
   }
 
+  public set state(state: PromiseState) {
+    throw 'Cannot set state';
+  }
+
   public static setAssertionExceptionTypes(assertionExceptionTypes: Function[]): void {
     this._assertionExceptionTypes = [];
     this._assertionExceptionTypes.push.apply(this._assertionExceptionTypes, assertionExceptionTypes);

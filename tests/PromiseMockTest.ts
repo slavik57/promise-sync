@@ -3733,5 +3733,15 @@ module Tests {
         ]);
       });
     });
+
+    describe('state', () => {
+      it('setting state should throw exception', () => {
+        // Act
+        var setAction = () => promiseMock.state = PromiseState.Pending;
+
+        // Assert
+        expect(setAction).to.throw();
+      })
+    })
   });
 }

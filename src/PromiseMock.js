@@ -9,6 +9,9 @@ var PromiseMock = (function () {
         get: function () {
             return this._state;
         },
+        set: function (state) {
+            throw 'Cannot set state';
+        },
         enumerable: true,
         configurable: true
     });

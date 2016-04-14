@@ -2499,5 +2499,11 @@ var Tests;
                 ]);
             });
         });
+        describe('state', function () {
+            it('setting state should throw exception', function () {
+                var setAction = function () { return promiseMock.state = index_1.PromiseState.Pending; };
+                chai_1.expect(setAction).to.throw();
+            });
+        });
     });
 })(Tests || (Tests = {}));
