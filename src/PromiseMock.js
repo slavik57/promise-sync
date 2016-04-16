@@ -77,9 +77,7 @@ var PromiseMock = (function () {
             nextPromise: new PromiseMock()
         };
         this._callbacks.push(callback);
-        if (this.isFulfilled()) {
-            this._resolveCallbacks(this._resolvedData);
-        }
+        this._handleIfNotPending();
         return callback.nextPromise;
     };
     PromiseMock.prototype.catch = function (failureCallback) {
@@ -88,9 +86,7 @@ var PromiseMock = (function () {
             nextPromise: new PromiseMock()
         };
         this._callbacks.push(callback);
-        if (this.isRejected()) {
-            this._rejectCallbacks(this._rejectedReason);
-        }
+        this._handleIfNotPending();
         return callback.nextPromise;
     };
     PromiseMock.prototype.then = function (successCallback, failureCallback) {
@@ -100,12 +96,7 @@ var PromiseMock = (function () {
             nextPromise: new PromiseMock()
         };
         this._callbacks.push(callback);
-        if (this.isFulfilled()) {
-            this._resolveCallbacks(this._resolvedData);
-        }
-        if (this.isRejected()) {
-            this._rejectCallbacks(this._rejectedReason);
-        }
+        this._handleIfNotPending();
         return callback.nextPromise;
     };
     PromiseMock.prototype.finally = function (successCallback) {
@@ -154,6 +145,14 @@ var PromiseMock = (function () {
             promise.reject(error);
         }
     };
+    PromiseMock.prototype._handleIfNotPending = function () {
+        if (this.isRejected()) {
+            this._rejectCallbacks(this._rejectedReason);
+        }
+        else if (this.isFulfilled()) {
+            this._resolveCallbacks(this._resolvedData);
+        }
+    };
     PromiseMock.prototype._resolveCallbacks = function (data) {
         var _this = this;
         this._callbacks.forEach(function (_callback) {
@@ -164,6 +163,9 @@ var PromiseMock = (function () {
     };
     PromiseMock.prototype._resolveCallback = function (callback, data) {
         if (!callback.success) {
+            if (!callback.finally) {
+                callback.nextPromise.resolve(data);
+            }
             return;
         }
         var result;
@@ -192,6 +194,9 @@ var PromiseMock = (function () {
     };
     PromiseMock.prototype._rejectCallback = function (callback, error) {
         if (!callback.failure) {
+            if (!callback.finally) {
+                callback.nextPromise.reject(error);
+            }
             return;
         }
         var result;

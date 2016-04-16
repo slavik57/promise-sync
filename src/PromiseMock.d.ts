@@ -27,6 +27,7 @@ export declare class PromiseMock<T> {
     private static _resolveIfAllResolvedWithDataOfAll(promise, dataSourcePromises);
     private static _resolveIfPending(promise, data);
     private static _rejectIfPending(promise, error);
+    private _handleIfNotPending();
     private _resolveCallbacks(data);
     private _resolveCallback(callback, data);
     private _rejectCallbacks(error);

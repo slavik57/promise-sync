@@ -114,9 +114,7 @@ export class PromiseMock<T> {
 
     this._callbacks.push(callback);
 
-    if (this.isFulfilled()) {
-      this._resolveCallbacks(this._resolvedData);
-    }
+    this._handleIfNotPending();
 
     return callback.nextPromise;
   }
@@ -129,9 +127,7 @@ export class PromiseMock<T> {
 
     this._callbacks.push(callback);
 
-    if (this.isRejected()) {
-      this._rejectCallbacks(this._rejectedReason);
-    }
+    this._handleIfNotPending();
 
     return callback.nextPromise;
   }
@@ -145,13 +141,7 @@ export class PromiseMock<T> {
 
     this._callbacks.push(callback);
 
-    if (this.isFulfilled()) {
-      this._resolveCallbacks(this._resolvedData);
-    }
-
-    if (this.isRejected()) {
-      this._rejectCallbacks(this._rejectedReason);
-    }
+    this._handleIfNotPending();
 
     return callback.nextPromise;
   }
@@ -218,6 +208,14 @@ export class PromiseMock<T> {
     }
   }
 
+  private _handleIfNotPending(): void {
+    if (this.isRejected()) {
+      this._rejectCallbacks(this._rejectedReason);
+    } else if (this.isFulfilled()) {
+      this._resolveCallbacks(this._resolvedData);
+    }
+  }
+
   private _resolveCallbacks(data: T): void {
     this._callbacks.forEach((_callback: ICallback<T>) =>
       this._resolveCallback(_callback, data));
@@ -228,6 +226,9 @@ export class PromiseMock<T> {
 
   private _resolveCallback(callback: ICallback<T>, data: T): void {
     if (!callback.success) {
+      if (!callback.finally) {
+        callback.nextPromise.resolve(data);
+      }
       return;
     }
 
@@ -260,6 +261,9 @@ export class PromiseMock<T> {
 
   private _rejectCallback(callback: ICallback<T>, error: any): void {
     if (!callback.failure) {
+      if (!callback.finally) {
+        callback.nextPromise.reject(error);
+      }
       return;
     }
 

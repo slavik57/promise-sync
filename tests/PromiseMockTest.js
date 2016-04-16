@@ -1953,6 +1953,222 @@ var Tests;
                     }
                 ]);
             });
+            it('then().catch() - first then has no error callback, reject promise, should call correctly to callbacks', function () {
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                var failureCallback = createCallback(CallbackType.Failure, 2, callbackRecords);
+                var errorToReject = 'errorToReject';
+                promiseMock.then(successCallback)
+                    .catch(failureCallback);
+                promiseMock.reject(errorToReject);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 2,
+                        data: errorToReject
+                    }
+                ]);
+            });
+            it('then().then() - first then has no error callback, second then has error callback, reject promise, should call correctly to callbacks', function () {
+                var callbackRecords = [];
+                var successCallback1 = createCallback(CallbackType.Success, 1, callbackRecords);
+                var successCallback2 = createCallback(CallbackType.Success, 2, callbackRecords);
+                var failureCallback1 = createCallback(CallbackType.Failure, 3, callbackRecords);
+                var errorToReject = 'errorToReject';
+                promiseMock.then(successCallback1)
+                    .then(successCallback2, failureCallback1);
+                promiseMock.reject(errorToReject);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 3,
+                        data: errorToReject
+                    }
+                ]);
+            });
+            it('catch().success() - resolve promise, should call correctly to callbacks', function () {
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var successCallback = createCallback(CallbackType.Success, 2, callbackRecords);
+                var dataToResolve = 'data';
+                promiseMock.catch(failureCallback)
+                    .success(successCallback);
+                promiseMock.resolve(dataToResolve);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 2,
+                        data: dataToResolve
+                    }
+                ]);
+            });
+            it('success().catch() - reject promise, should call correctly to callbacks', function () {
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var successCallback = createCallback(CallbackType.Success, 2, callbackRecords);
+                var errorToReject = 'error';
+                promiseMock.success(successCallback)
+                    .catch(failureCallback);
+                promiseMock.reject(errorToReject);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 1,
+                        data: errorToReject
+                    }
+                ]);
+            });
+            it('catch().then() - resolve promise, should call correctly to callbacks', function () {
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var successCallback = createCallback(CallbackType.Success, 2, callbackRecords);
+                var dataToResolve = 'data';
+                promiseMock.catch(failureCallback)
+                    .then(successCallback);
+                promiseMock.resolve(dataToResolve);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 2,
+                        data: dataToResolve
+                    }
+                ]);
+            });
+            it('then().catch() - reject promise before registrations, first then has no error callback, should call correctly to callbacks', function () {
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                var failureCallback = createCallback(CallbackType.Failure, 2, callbackRecords);
+                var errorToReject = 'errorToReject';
+                promiseMock.reject(errorToReject);
+                promiseMock.then(successCallback)
+                    .catch(failureCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 2,
+                        data: errorToReject
+                    }
+                ]);
+            });
+            it('then().then() - reject promise before registrations, first then has no error callback, second then has error callback, should call correctly to callbacks', function () {
+                var callbackRecords = [];
+                var successCallback1 = createCallback(CallbackType.Success, 1, callbackRecords);
+                var successCallback2 = createCallback(CallbackType.Success, 2, callbackRecords);
+                var failureCallback1 = createCallback(CallbackType.Failure, 3, callbackRecords);
+                var errorToReject = 'errorToReject';
+                promiseMock.reject(errorToReject);
+                promiseMock.then(successCallback1)
+                    .then(successCallback2, failureCallback1);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 3,
+                        data: errorToReject
+                    }
+                ]);
+            });
+            it('catch().success() - resolve promise, then register, should call correctly to callbacks', function () {
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var successCallback = createCallback(CallbackType.Success, 2, callbackRecords);
+                var dataToResolve = 'data';
+                promiseMock.resolve(dataToResolve);
+                promiseMock.catch(failureCallback)
+                    .success(successCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 2,
+                        data: dataToResolve
+                    }
+                ]);
+            });
+            it('success().catch() - reject promise, then register, should call correctly to callbacks', function () {
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var successCallback = createCallback(CallbackType.Success, 2, callbackRecords);
+                var errorToReject = 'error';
+                promiseMock.reject(errorToReject);
+                promiseMock.success(successCallback)
+                    .catch(failureCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Failure,
+                        callbackNumber: 1,
+                        data: errorToReject
+                    }
+                ]);
+            });
+            it('catch().then() - resolve promise, then register, should call correctly to callbacks', function () {
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                var successCallback = createCallback(CallbackType.Success, 2, callbackRecords);
+                var dataToResolve = 'data';
+                promiseMock.resolve(dataToResolve);
+                promiseMock.catch(failureCallback)
+                    .then(successCallback);
+                chai_1.expect(callbackRecords).to.be.eql([
+                    {
+                        type: CallbackType.Success,
+                        callbackNumber: 2,
+                        data: dataToResolve
+                    }
+                ]);
+            });
+            it('catch().finally() - resolve the promise, should call the finally callback', function () {
+                var numberOfTimesCalled = 0;
+                var finallyCallback = function () { return numberOfTimesCalled++; };
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                promiseMock.catch(failureCallback).finally(finallyCallback);
+                promiseMock.resolve();
+                chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            });
+            it('success().finally() - reject the promise, should call the finally callback', function () {
+                var numberOfTimesCalled = 0;
+                var finallyCallback = function () { return numberOfTimesCalled++; };
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                promiseMock.success(successCallback).finally(finallyCallback);
+                promiseMock.reject();
+                chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            });
+            it('catch().finally() - resolve the promise, then register, should call the finally callback', function () {
+                var numberOfTimesCalled = 0;
+                var finallyCallback = function () { return numberOfTimesCalled++; };
+                var callbackRecords = [];
+                var failureCallback = createCallback(CallbackType.Failure, 1, callbackRecords);
+                promiseMock.resolve();
+                promiseMock.catch(failureCallback).finally(finallyCallback);
+                chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            });
+            it('success().finally() - reject the promise, then register, should call the finally callback', function () {
+                var numberOfTimesCalled = 0;
+                var finallyCallback = function () { return numberOfTimesCalled++; };
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                promiseMock.reject();
+                promiseMock.success(successCallback).finally(finallyCallback);
+                chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            });
+            it('then().finally() - reject the promise, should call the finally callback', function () {
+                var numberOfTimesCalled = 0;
+                var finallyCallback = function () { return numberOfTimesCalled++; };
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                promiseMock.then(successCallback).finally(finallyCallback);
+                promiseMock.reject();
+                chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            });
+            it('then().finally() - reject the promise, then register, should call the finally callback', function () {
+                var numberOfTimesCalled = 0;
+                var finallyCallback = function () { return numberOfTimesCalled++; };
+                var callbackRecords = [];
+                var successCallback = createCallback(CallbackType.Success, 1, callbackRecords);
+                promiseMock.reject();
+                promiseMock.then(successCallback).finally(finallyCallback);
+                chai_1.expect(numberOfTimesCalled).to.be.equal(1);
+            });
         });
         describe('static resolve', function () {
             it('the returned promise state should be resolved', function () {
