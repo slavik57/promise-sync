@@ -3,7 +3,7 @@ Synchronous promise for making testing experience much easier.
 
 ## Installation
 ```
-npm install promise-sync
+npm install promise-sync --save-dev
 ```
 
 ## Why?
