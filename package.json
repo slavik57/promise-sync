@@ -4,7 +4,7 @@
   "description": "synchronous promise stub",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha tests --recursive -c -b"
+    "test": "./node_modules/.bin/mocha tests --recursive -c -b"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
   "homepage": "https://github.com/slavik57/promise-sync#readme",
   "devDependencies": {
     "chai": "^3.5.0",
+    "mocha": "^2.5.3",
     "sinon": "^1.17.3"
   }
 }
