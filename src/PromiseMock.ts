@@ -193,7 +193,9 @@ export class PromiseMock<T> {
 
     var results: any[] = dataSourcePromises.map(_promise => _promise._resolvedData);
 
-    promise.resolve(results);
+    if (promise.isPending()) {
+      promise.resolve(results);
+    }
   }
 
   private static _resolveIfPending(promise: PromiseMock<any[]>, data: any): void {
