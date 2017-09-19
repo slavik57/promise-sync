@@ -1,6 +1,7 @@
 "use strict";
-var chai_1 = require('chai');
-var index_1 = require('../index');
+Object.defineProperty(exports, "__esModule", { value: true });
+var chai_1 = require("chai");
+var index_1 = require("../index");
 index_1.PromiseMock.setAssertionExceptionTypes([chai_1.AssertionError]);
 var Tests;
 (function (Tests) {
@@ -267,7 +268,8 @@ var Tests;
                         type: CallbackType.Success,
                         callbackNumber: 4,
                         data: data4
-                    }]);
+                    }
+                ]);
             });
             it('register to success on the returned promise, resolve with data, some callbacks dont return nothing, should call the next callback with correct data', function () {
                 var data1 = 11;
@@ -298,7 +300,8 @@ var Tests;
                         type: CallbackType.Success,
                         callbackNumber: 4,
                         data: data2
-                    }]);
+                    }
+                ]);
             });
             it('register to success on the returned promise, reject with error, should not call the next success callback', function () {
                 var error = 'error';
@@ -354,7 +357,8 @@ var Tests;
                         type: CallbackType.Success,
                         callbackNumber: 4,
                         data: data4
-                    }]);
+                    }
+                ]);
             });
             it('register to success on the returned promise, resolve with data, promises return object with then, should call the next callbacks with correct data', function () {
                 var data1 = 11;
@@ -396,7 +400,8 @@ var Tests;
                         type: CallbackType.Success,
                         callbackNumber: 4,
                         data: data4
-                    }]);
+                    }
+                ]);
             });
             it('register to catch on the returned promise, resolve with data, success callback throws error, should call the next catch callback', function () {
                 var data = 'data';
@@ -630,7 +635,8 @@ var Tests;
                         type: CallbackType.Failure,
                         callbackNumber: 1,
                         data: error1
-                    }]);
+                    }
+                ]);
             });
             it('register to catch on the returned promise, resolve with data, should not call the next catch callback', function () {
                 var data = 'data';
@@ -831,7 +837,8 @@ var Tests;
                         type: CallbackType.Success,
                         callbackNumber: 4,
                         data: data4
-                    }]);
+                    }
+                ]);
             });
             it('register to success on the returned promise, resolve with data, some callbacks dont return nothing, should call the next success callback with correct data', function () {
                 var data1 = 11;
@@ -862,7 +869,8 @@ var Tests;
                         type: CallbackType.Success,
                         callbackNumber: 4,
                         data: data2
-                    }]);
+                    }
+                ]);
             });
             it('register to success on the returned promise, reject with error, should not call the next success callback given in then', function () {
                 var error = 'error';
@@ -935,7 +943,8 @@ var Tests;
                         type: CallbackType.Success,
                         callbackNumber: 4,
                         data: data4
-                    }]);
+                    }
+                ]);
             });
             it('register to success on the returned promise, resolve with data, promises return objects with then, should call the next success callbacks with correct data', function () {
                 var data1 = 11;
@@ -977,7 +986,8 @@ var Tests;
                         type: CallbackType.Success,
                         callbackNumber: 4,
                         data: data4
-                    }]);
+                    }
+                ]);
             });
             it('register to catch on the returned promise, resolve with data, success callback throws error, should call the next catch callback', function () {
                 var data = 'data';
@@ -1266,7 +1276,8 @@ var Tests;
                         type: CallbackType.Failure,
                         callbackNumber: 1,
                         data: error1
-                    }]);
+                    }
+                ]);
             });
             it('register to catch on the returned promise, resolve with data, should not call the next catch callback', function () {
                 var data = 'data';

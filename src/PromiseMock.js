@@ -1,5 +1,6 @@
 "use strict";
-var PromiseState_1 = require('./enums/PromiseState');
+Object.defineProperty(exports, "__esModule", { value: true });
+var PromiseState_1 = require("./enums/PromiseState");
 var PromiseMock = (function () {
     function PromiseMock() {
         this._callbacks = [];
@@ -133,7 +134,9 @@ var PromiseMock = (function () {
             return;
         }
         var results = dataSourcePromises.map(function (_promise) { return _promise._resolvedData; });
-        promise.resolve(results);
+        if (promise.isPending()) {
+            promise.resolve(results);
+        }
     };
     PromiseMock._resolveIfPending = function (promise, data) {
         if (promise.isPending()) {
@@ -295,7 +298,7 @@ var PromiseMock = (function () {
     PromiseMock.prototype._isHasFinallyMethod = function (result) {
         return !!result && !!result.finally;
     };
-    PromiseMock._assertionExceptionTypes = [];
     return PromiseMock;
 }());
+PromiseMock._assertionExceptionTypes = [];
 exports.PromiseMock = PromiseMock;
