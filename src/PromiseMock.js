@@ -2,9 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var PromiseState_1 = require("./enums/PromiseState");
 var PromiseMock = (function () {
-    function PromiseMock() {
+    function PromiseMock(constructorExecutor) {
         this._callbacks = [];
         this._state = PromiseState_1.PromiseState.Pending;
+        if (constructorExecutor) {
+            constructorExecutor(this.resolve.bind(this), this.reject.bind(this));
+        }
     }
     Object.defineProperty(PromiseMock.prototype, "state", {
         get: function () {
@@ -298,7 +301,7 @@ var PromiseMock = (function () {
     PromiseMock.prototype._isHasFinallyMethod = function (result) {
         return !!result && !!result.finally;
     };
+    PromiseMock._assertionExceptionTypes = [];
     return PromiseMock;
 }());
-PromiseMock._assertionExceptionTypes = [];
 exports.PromiseMock = PromiseMock;

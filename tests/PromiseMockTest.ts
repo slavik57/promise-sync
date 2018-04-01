@@ -101,6 +101,137 @@ module Tests {
       });
     });
 
+    describe('constructor executor', () => {
+      let resolver: (data?: any) => void;
+      let rejecter: (error?: any) => void;
+
+      beforeEach(() => {
+        promiseMock = new PromiseMock<any>((resolve, reject) => {
+          resolver = resolve;
+          rejecter = reject;
+        });
+      })
+
+      it('should initialize state correctly', () => {
+        expect(promiseMock.state).to.equal(PromiseState.Pending);
+      });
+
+      it('should initialize isFulfilled correctly', () => {
+        // Assert
+        expect(promiseMock.isFulfilled()).to.equal(false);
+      });
+
+      it('should initialize isRejected correctly', () => {
+        // Assert
+        expect(promiseMock.isRejected()).to.equal(false);
+      });
+
+      it('should initialize isPending correctly', () => {
+        // Assert
+        expect(promiseMock.isPending()).to.equal(true);
+      });
+
+      describe('resolve', () => {
+        it('resolve should set the state to resolved', () => {
+          // Act
+          resolver();
+  
+          // Assert
+          expect(promiseMock.state).to.equal(PromiseState.Fulfilled);
+        });
+  
+        it('isFulfilled should be true', () => {
+          // Act
+          resolver();
+  
+          // Assert
+          expect(promiseMock.isFulfilled()).to.equal(true);
+        });
+  
+        it('isRejected should be false', () => {
+          // Act
+          resolver();
+  
+          // Assert
+          expect(promiseMock.isRejected()).to.equal(false);
+        });
+  
+        it('isPending should be false', () => {
+          // Act
+          resolver();
+  
+          // Assert
+          expect(promiseMock.isPending()).to.equal(false);
+        });
+  
+        it('resolve twice should fail', () => {
+          // Act
+          resolver();
+  
+          // Assert
+          expect(() => promiseMock.resolve()).to.throw(Error);
+        });
+  
+        it('calling resolve after reject should fail', () => {
+          // Act
+          rejecter();
+  
+          // Assert
+          expect(() => promiseMock.resolve()).to.throw(Error);
+        });
+      });
+  
+      describe('reject', () => {
+        it('reject should set the state to rejected', () => {
+          // Act
+          rejecter();
+  
+          // Assert
+          expect(promiseMock.state).to.equal(PromiseState.Rejected);
+        });
+  
+        it('reject should set isFulfilled to false', () => {
+          // Act
+          rejecter();
+  
+          // Assert
+          expect(promiseMock.isFulfilled()).to.equal(false);
+        });
+  
+        it('reject should set isPending to false', () => {
+          // Act
+          rejecter();
+  
+          // Assert
+          expect(promiseMock.isPending()).to.equal(false);
+        });
+  
+        it('reject should set isRejected to false', () => {
+          // Act
+          rejecter();
+  
+          // Assert
+          expect(promiseMock.isRejected()).to.equal(true);
+        });
+  
+        it('reject twice should not fail and set as rejected', () => {
+          // Act
+          rejecter();
+  
+          // Assert
+          expect(() => promiseMock.reject()).to.throw(Error);
+        });
+  
+        it('calling reject after resolve should fail', () => {
+          // Act
+          resolver();
+  
+          // Assert
+          expect(() => promiseMock.reject()).to.throw(Error);
+        });
+      });
+    });
+
     describe('resolve', () => {
       it('resolve should set the state to resolved', () => {
         // Act

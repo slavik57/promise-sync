@@ -1,13 +1,14 @@
 import { PromiseState } from './enums/PromiseState';
 import { ISuccessCallback } from './interfaces/ISuccessCallback';
 import { IFailureCallback } from './interfaces/IFailureCallback';
+import { IConstructorExecutor } from './interfaces/IConstructorExecutor';
 export declare class PromiseMock<T> {
     private static _assertionExceptionTypes;
     private _callbacks;
     private _state;
     private _resolvedData;
     private _rejectedReason;
-    constructor();
+    constructor(constructorExecutor?: IConstructorExecutor<T>);
     state: PromiseState;
     static setAssertionExceptionTypes(assertionExceptionTypes: Function[]): void;
     static resolve<T>(data?: T): PromiseMock<T>;
