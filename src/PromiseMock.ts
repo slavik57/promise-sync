@@ -2,6 +2,7 @@ import {PromiseState} from './enums/PromiseState';
 import {ICallback} from './interfaces/ICallback';
 import {ISuccessCallback} from './interfaces/ISuccessCallback';
 import {IFailureCallback} from './interfaces/IFailureCallback';
+import {IConstructorExecutor} from './interfaces/IConstructorExecutor';
 
 export class PromiseMock<T> {
   private static _assertionExceptionTypes = [];
@@ -11,9 +12,13 @@ export class PromiseMock<T> {
   private _resolvedData: T;
   private _rejectedReason: any;
 
-  constructor() {
+  constructor(constructorExecutor?: IConstructorExecutor<T>) {
     this._callbacks = [];
     this._state = PromiseState.Pending;
+
+    if (constructorExecutor) {
+      constructorExecutor(this.resolve.bind(this), this.reject.bind(this));
+    }
   }
 
   public get state(): PromiseState {

@@ -69,6 +69,80 @@ var Tests;
                 chai_1.expect(promiseMock.isPending()).to.equal(true);
             });
         });
+        describe('constructor executor', function () {
+            var resolver;
+            var rejecter;
+            beforeEach(function () {
+                promiseMock = new index_1.PromiseMock(function (resolve, reject) {
+                    resolver = resolve;
+                    rejecter = reject;
+                });
+            });
+            it('should initialize state correctly', function () {
+                chai_1.expect(promiseMock.state).to.equal(index_1.PromiseState.Pending);
+            });
+            it('should initialize isFulfilled correctly', function () {
+                chai_1.expect(promiseMock.isFulfilled()).to.equal(false);
+            });
+            it('should initialize isRejected correctly', function () {
+                chai_1.expect(promiseMock.isRejected()).to.equal(false);
+            });
+            it('should initialize isPending correctly', function () {
+                chai_1.expect(promiseMock.isPending()).to.equal(true);
+            });
+            describe('resolve', function () {
+                it('resolve should set the state to resolved', function () {
+                    resolver();
+                    chai_1.expect(promiseMock.state).to.equal(index_1.PromiseState.Fulfilled);
+                });
+                it('isFulfilled should be true', function () {
+                    resolver();
+                    chai_1.expect(promiseMock.isFulfilled()).to.equal(true);
+                });
+                it('isRejected should be false', function () {
+                    resolver();
+                    chai_1.expect(promiseMock.isRejected()).to.equal(false);
+                });
+                it('isPending should be false', function () {
+                    resolver();
+                    chai_1.expect(promiseMock.isPending()).to.equal(false);
+                });
+                it('resolve twice should fail', function () {
+                    resolver();
+                    chai_1.expect(function () { return promiseMock.resolve(); }).to.throw(Error);
+                });
+                it('calling resolve after reject should fail', function () {
+                    rejecter();
+                    chai_1.expect(function () { return promiseMock.resolve(); }).to.throw(Error);
+                });
+            });
+            describe('reject', function () {
+                it('reject should set the state to rejected', function () {
+                    rejecter();
+                    chai_1.expect(promiseMock.state).to.equal(index_1.PromiseState.Rejected);
+                });
+                it('reject should set isFulfilled to false', function () {
+                    rejecter();
+                    chai_1.expect(promiseMock.isFulfilled()).to.equal(false);
+                });
+                it('reject should set isPending to false', function () {
+                    rejecter();
+                    chai_1.expect(promiseMock.isPending()).to.equal(false);
+                });
+                it('reject should set isRejected to false', function () {
+                    rejecter();
+                    chai_1.expect(promiseMock.isRejected()).to.equal(true);
+                });
+                it('reject twice should not fail and set as rejected', function () {
+                    rejecter();
+                    chai_1.expect(function () { return promiseMock.reject(); }).to.throw(Error);
+                });
+                it('calling reject after resolve should fail', function () {
+                    resolver();
+                    chai_1.expect(function () { return promiseMock.reject(); }).to.throw(Error);
+                });
+            });
+        });
         describe('resolve', function () {
             it('resolve should set the state to resolved', function () {
                 promiseMock.resolve();
